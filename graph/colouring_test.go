@@ -1,8 +1,11 @@
 package graph_test
 
-import "testing"
-import "github.com/Tom-Johnston/gigraph/graph"
-import "github.com/Tom-Johnston/gigraph/graph/search"
+import (
+	"testing"
+
+	"github.com/Tom-Johnston/gigraph/graph"
+	"github.com/Tom-Johnston/gigraph/graph/search"
+)
 
 //From http://keithbriggs.info/cgt.html
 // n =  1   2   3   4    5    6     7      8        9       10
@@ -88,6 +91,24 @@ func TestChromaticIndex(t *testing.T) {
 		if !graph.IntsEqual(foundData, truthData[i-1]) {
 			t.Log(foundData)
 			t.Log(truthData)
+			t.Fail()
+		}
+	}
+}
+
+func TestChromaticPolynomial(t *testing.T) {
+	truthData := make(map[string][]int)
+	truthData["IheA@GUAo"] = []int{0, -704, 2606, -4305, 4275, -2861, 1353, -455, 105, -15, 1}
+	truthData["Dhc"] = []int{0, 4, -10, 10, -5, 1}
+	for g6 := range truthData {
+		g, err := graph.Graph6Decode(g6)
+		if err != nil {
+			t.Log(err)
+			t.Fail()
+			continue
+		}
+		cp := graph.ChromaticPolynomial(g)
+		if !graph.IntsEqual(cp, truthData[g6]) {
 			t.Fail()
 		}
 	}
