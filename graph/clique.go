@@ -1,5 +1,8 @@
 package graph
 
+import "math/rand"
+import "github.com/Tom-Johnston/gigraph/sortints"
+
 //cliqueData is a wrapper used in the CliqueNumber.
 type cliqueData struct {
 	R []int
@@ -187,4 +190,18 @@ func CliqueNumber(g Graph) int {
 func IndependenceNumber(g Graph) int {
 	h := Complement(g)
 	return CliqueNumber(h)
+}
+
+//RandomMaximalClique builds a random maximal clique by iteratively choosing an allowed vertex uniformly at random and adding it to the clique.
+func RandomMaximalClique(g Graph, seed int64) []int {
+	r := rand.New(rand.NewSource(seed))
+	clique := make([]int, 0)
+	options := sortints.Range(0, g.N(), 1)
+	for len(options) > 0 {
+		index := r.Intn(len(options))
+		option := options[index]
+		clique = append(clique, option)
+		options = sortints.Intersection(options, g.Neighbours(option))
+	}
+	return clique
 }
