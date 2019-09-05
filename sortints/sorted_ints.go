@@ -23,6 +23,27 @@ func NewSortedInts(x ...int) SortedInts {
 	return tmp[:len(tmp)-numberOfRepeats]
 }
 
+//Range creates a SortedInts by adding all the elements of the form start + i*step which lie in [start, end).
+func Range(start, end, step int) SortedInts {
+	if (end < start && step > 0) || (end > start && step < 0) || (end != start && step == 0) {
+		panic("Infinite set")
+	}
+	if end == start {
+		return []int{}
+	}
+
+	if end < start {
+		start, end = end, start
+		step = -step
+	}
+
+	tmp := make([]int, 0, (end-start+step-1)/step)
+	for i := start; i < end; i += step {
+		tmp = append(tmp, i)
+	}
+	return tmp
+}
+
 //Remove modifies s by removing the element x if it is present.
 func (s *SortedInts) Remove(x int) {
 	index := sort.SearchInts(*s, x)
