@@ -273,3 +273,14 @@ func GeneralisedPetersenGraph(n, k int) *DenseGraph {
 	}
 	return g
 }
+
+//FriendshipGraph returns the graph woth 2n + 1 vertices and 3n edges which is n copies of C_3 which share a common vertex.
+func FriendshipGraph(n int) *DenseGraph {
+	g := NewDense(2*n+1, nil)
+	for i := 0; i < n; i++ {
+		g.AddEdge(2*i+1, 2*i+2)
+		g.AddEdge(0, 2*i+1)
+		g.AddEdge(0, 2*i+2)
+	}
+	return g
+}
