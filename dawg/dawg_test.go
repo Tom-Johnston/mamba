@@ -65,6 +65,36 @@ func TestContains(t *testing.T) {
 	}
 }
 
+func TestPattern(t *testing.T) {
+	dawg, err := New(anagramWords)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedResult := [][]byte{[]byte("post"), []byte("pots")}
+	result := dawg.Pattern([]byte("po??"), 63)
+	if len(result) != len(expectedResult) {
+		t.Fail()
+	} else {
+		for i := range result {
+			if bytes.Equal(result[i], expectedResult[i]) == false {
+				t.Fail()
+			}
+		}
+	}
+
+	expectedResult = [][]byte{[]byte("tops"), []byte("ttps")}
+	result = dawg.Pattern([]byte("t?ps"), 63)
+	if len(result) != len(expectedResult) {
+		t.Fail()
+	} else {
+		for i := range result {
+			if bytes.Equal(result[i], expectedResult[i]) == false {
+				t.Fail()
+			}
+		}
+	}
+}
+
 func TestAnagrams(t *testing.T) {
 	dawg, err := New(anagramWords)
 	if err != nil {
@@ -168,6 +198,18 @@ func BenchmarkNew(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		New(words)
+	}
+}
+
+func BenchmarkPattern(b *testing.B) {
+	dawg, err := crossWord()
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		dawg.Pattern([]byte("al???ing"), 63)
 	}
 }
 

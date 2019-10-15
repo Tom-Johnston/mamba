@@ -133,6 +133,49 @@ type letterCount struct {
 	count  int
 }
 
+//Pattern returns the words in the dawg where each letter matches the letter in word except in the positions of word which contain a blank.
+func (t *Dawg) Pattern(word []byte, blank byte) [][]byte {
+	patterns := make([][]byte, 0)
+	currDecisions := make([]int, 1, len(word))
+	currDecisions[0] = -1
+	currDawgs := make([]*Dawg, 1, len(word))
+	currDawgs[0] = t
+	currWord := make([]byte, 0, len(word))
+toCheckLoop:
+	for true {
+		index := len(currWord)
+		currDawg := currDawgs[len(currDawgs)-1]
+		if len(currWord) == len(word) {
+			if currDawg.final {
+				tmpWord := make([]byte, len(currWord))
+				copy(tmpWord, currWord)
+				patterns = append(patterns, tmpWord)
+			}
+		} else {
+			for j := currDecisions[len(currDecisions)-1] + 1; j < len(currDawg.linkLabels); j++ {
+				l := currDawg.linkLabels[j]
+				if word[index] == l || word[index] == blank {
+					currWord = append(currWord, l)
+					currDawgs = append(currDawgs, currDawg.links[j])
+					currDecisions[len(currDecisions)-1] = j
+					currDecisions = append(currDecisions, -1)
+					continue toCheckLoop
+				}
+			}
+		}
+		//Now we go back
+		//Can we go back?
+		if len(currWord) == 0 {
+			return patterns
+		}
+		currWord = currWord[:len(currWord)-1]
+		currDecisions = currDecisions[:len(currDecisions)-1]
+		currDawgs = currDawgs[:len(currDawgs)-1]
+	}
+	//We can never return here
+	return patterns
+}
+
 //Anagrams returns the words in the dawg which have the same multiset of letters as the variable letters. Any letters with the value blank are assumed to be wildcards and match any letter.
 func (t *Dawg) Anagrams(letters []byte, blank byte) [][]byte {
 	tmp := make([]byte, len(letters))
