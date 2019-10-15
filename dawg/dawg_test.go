@@ -201,6 +201,18 @@ func BenchmarkNew(b *testing.B) {
 	}
 }
 
+func BenchmarkContains(b *testing.B) {
+	dawg, err := crossWord()
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		dawg.Contains([]byte("alerting"))
+	}
+}
+
 func BenchmarkPattern(b *testing.B) {
 	dawg, err := crossWord()
 	if err != nil {
