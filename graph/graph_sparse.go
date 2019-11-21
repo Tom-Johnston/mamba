@@ -119,25 +119,27 @@ func (g *SparseGraph) RemoveVertex(i int) {
 //AddEdge modifies the graph by adding the edge (i, j) if it is not already present.
 //If the edge is already present (or i == j), this does nothing.
 func (g *SparseGraph) AddEdge(i, j int) {
-	if !g.IsEdge(i, j) {
-		g.Neighbourhoods[i].Add(j)
-		g.Neighbourhoods[j].Add(i)
-		g.NumberOfEdges++
-		g.DegreeSequence[i]++
-		g.DegreeSequence[j]++
+	if i == j || g.IsEdge(i, j) {
+		return
 	}
+	g.Neighbourhoods[i].Add(j)
+	g.Neighbourhoods[j].Add(i)
+	g.NumberOfEdges++
+	g.DegreeSequence[i]++
+	g.DegreeSequence[j]++
 }
 
 //RemoveEdge modifies the graph by removing the edge (i, j) if it is present.
 //If the edge is not already present, this does nothing.
 func (g *SparseGraph) RemoveEdge(i, j int) {
-	if g.IsEdge(i, j) {
-		g.Neighbourhoods[i].Remove(j)
-		g.Neighbourhoods[j].Remove(i)
-		g.NumberOfEdges--
-		g.DegreeSequence[i]--
-		g.DegreeSequence[j]--
+	if i == j || !g.IsEdge(i, j) {
+		return
 	}
+	g.Neighbourhoods[i].Remove(j)
+	g.Neighbourhoods[j].Remove(i)
+	g.NumberOfEdges--
+	g.DegreeSequence[i]--
+	g.DegreeSequence[j]--
 }
 
 //InducedSubgraph returns a deep copy of the induced subgraph of g with vertices given in order by V.
