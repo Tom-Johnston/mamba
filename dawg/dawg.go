@@ -248,6 +248,7 @@ toCheckLoop:
 			for i := range counts {
 				if counts[i].letter == pathElem {
 					counts[i].count++
+					break
 				}
 			}
 		}

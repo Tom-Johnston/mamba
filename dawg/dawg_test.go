@@ -95,6 +95,38 @@ func TestPattern(t *testing.T) {
 	}
 }
 
+func TestPatternSearcher(t *testing.T) {
+	dawg, err := New(anagramWords)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedResult := [][]byte{[]byte("post"), []byte("pots")}
+	ps := NewPatternSearcher([]byte("po??"), 63)
+	result := dawg.Search(ps)
+	if len(result) != len(expectedResult) {
+		t.Fail()
+	} else {
+		for i := range result {
+			if bytes.Equal(result[i], expectedResult[i]) == false {
+				t.Fail()
+			}
+		}
+	}
+
+	expectedResult = [][]byte{[]byte("tops"), []byte("ttps")}
+	ps = NewPatternSearcher([]byte("t?ps"), 63)
+	result = dawg.Search(ps)
+	if len(result) != len(expectedResult) {
+		t.Fail()
+	} else {
+		for i := range result {
+			if bytes.Equal(result[i], expectedResult[i]) == false {
+				t.Fail()
+			}
+		}
+	}
+}
+
 func TestAnagrams(t *testing.T) {
 	dawg, err := New(anagramWords)
 	if err != nil {
@@ -131,6 +163,70 @@ func TestAnagrams(t *testing.T) {
 	result = dawg.Anagrams([]byte("ttps"), 0)
 	if len(result) != 1 {
 		t.Fatal(result)
+	}
+}
+
+func TestAnagramSearcher(t *testing.T) {
+	dawg, err := New(anagramWords)
+	if err != nil {
+		t.Fatal(err)
+	}
+	expectedResult := [][]byte{[]byte("post"), []byte("pots"), []byte("spot"), []byte("stop"), []byte("tops")}
+	as := NewAnagramSearcher([]byte("post"), 0)
+	result := dawg.Search(as)
+	if len(result) != len(expectedResult) {
+		t.Fail()
+	} else {
+		for i := range result {
+			if bytes.Equal(result[i], expectedResult[i]) == false {
+				t.Fail()
+			}
+		}
+	}
+	as = NewAnagramSearcher([]byte{112, 111, 0, 0}, 0)
+	result = dawg.Search(as)
+	if len(result) != len(expectedResult) {
+		t.Fail()
+	} else {
+		for i := range result {
+			if bytes.Equal(result[i], expectedResult[i]) == false {
+				t.Fail()
+			}
+		}
+	}
+
+	as = NewAnagramSearcher([]byte{112, 113, 0, 0}, 0)
+	result = dawg.Search(as)
+	if len(result) != 0 {
+		t.Log(result)
+		t.Fail()
+	}
+
+	as = NewAnagramSearcher([]byte("ttps"), 0)
+	result = dawg.Search(as)
+	if len(result) != 1 {
+		t.Fatal(result)
+	}
+}
+
+func TestAnagramPattern(t *testing.T) {
+	dawg, err := New(anagramWords)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedResult := [][]byte{[]byte("tops")}
+	as := NewAnagramSearcher([]byte("o???"), 63)
+	ps := NewPatternSearcher([]byte("t?ps"), 63)
+	result := dawg.Search(as, ps)
+	if len(result) != len(expectedResult) {
+		t.Fail()
+	} else {
+		for i := range result {
+			if bytes.Equal(result[i], expectedResult[i]) == false {
+				t.Fail()
+			}
+		}
 	}
 }
 
