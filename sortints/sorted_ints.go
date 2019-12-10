@@ -11,6 +11,7 @@ type SortedInts []int
 //NewSortedInts creates a SortedInts from the set input x.
 func NewSortedInts(x ...int) SortedInts {
 	tmp := make([]int, len(x))
+	copy(tmp, x)
 	sort.Ints(tmp)
 	numberOfRepeats := 0
 	for i := 1; i < len(tmp); i++ {
