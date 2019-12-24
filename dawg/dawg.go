@@ -3,7 +3,6 @@ package dawg
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"math/bits"
 	"sort"
@@ -50,10 +49,9 @@ func (db *Builder) Add(b []byte) error {
 	}
 
 	if db.lastWord != nil && bytes.Compare(db.lastWord, b) != -1 {
-		fmt.Println(db.lastWord, b)
 		return errors.New("byte slices must be added in lexicographical order")
 	}
-
+	db.lastWord = b
 	_, suffix, lastNode := db.d.commonPrefix(b)
 	if len(lastNode.links) != 0 {
 		db.register = replaceOrRegister(lastNode, db.register)
