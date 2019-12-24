@@ -9,7 +9,7 @@ import (
 )
 
 var words [][]byte = [][]byte{[]byte("abject"), []byte("abjection"), []byte("abjections"), []byte("abjectly"), []byte("abjectness"), []byte("ablate"), []byte("ablated"), []byte("ablation"), []byte("ablations")}
-var anagramWords [][]byte = [][]byte{[]byte("alerting"), []byte("altering"), []byte("integral"), []byte("post"), []byte("pots"), []byte("relating"), []byte("spot"), []byte("stop"), []byte("tops"), []byte("triangle"), []byte("ttps")}
+var anagramWords [][]byte = [][]byte{[]byte("alerting"), []byte("altering"), []byte("integral"), []byte("post"), []byte("pot"), []byte("pots"), []byte("relating"), []byte("spot"), []byte("stop"), []byte("tops"), []byte("tppss"), []byte("triangle"), []byte("ttps")}
 
 func TestBuilder(t *testing.T) {
 	db := new(Builder)
@@ -45,52 +45,24 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestContains(t *testing.T) {
+func TestLookup(t *testing.T) {
 	dawg, err := New(words)
 	if err != nil {
 		t.Fatal(err)
 	}
 	testPasses := words
-	for _, test := range testPasses {
-		if dawg.Contains(test) == false {
+	for i, test := range testPasses {
+		if id, ok := dawg.Lookup(test); ok == false || id != (i) {
+			t.Log(id, i)
 			t.Fail()
 		}
 	}
 
 	testFails := [][]byte{[]byte("ab"), []byte(""), []byte("hello")}
 	for _, test := range testFails {
-		if dawg.Contains(test) == true {
+		if _, ok := dawg.Lookup(test); ok == true {
+
 			t.Fail()
-		}
-	}
-}
-
-func TestPattern(t *testing.T) {
-	dawg, err := New(anagramWords)
-	if err != nil {
-		t.Fatal(err)
-	}
-	expectedResult := [][]byte{[]byte("post"), []byte("pots")}
-	result := dawg.Pattern([]byte("po??"), 63)
-	if len(result) != len(expectedResult) {
-		t.Fail()
-	} else {
-		for i := range result {
-			if bytes.Equal(result[i], expectedResult[i]) == false {
-				t.Fail()
-			}
-		}
-	}
-
-	expectedResult = [][]byte{[]byte("tops"), []byte("ttps")}
-	result = dawg.Pattern([]byte("t?ps"), 63)
-	if len(result) != len(expectedResult) {
-		t.Fail()
-	} else {
-		for i := range result {
-			if bytes.Equal(result[i], expectedResult[i]) == false {
-				t.Fail()
-			}
 		}
 	}
 }
@@ -102,7 +74,7 @@ func TestPatternSearcher(t *testing.T) {
 	}
 	expectedResult := [][]byte{[]byte("post"), []byte("pots")}
 	ps := NewPatternSearcher([]byte("po??"), 63)
-	result := dawg.Search(ps)
+	result, _ := dawg.Search(ps)
 	if len(result) != len(expectedResult) {
 		t.Fail()
 	} else {
@@ -115,7 +87,7 @@ func TestPatternSearcher(t *testing.T) {
 
 	expectedResult = [][]byte{[]byte("tops"), []byte("ttps")}
 	ps = NewPatternSearcher([]byte("t?ps"), 63)
-	result = dawg.Search(ps)
+	result, _ = dawg.Search(ps)
 	if len(result) != len(expectedResult) {
 		t.Fail()
 	} else {
@@ -124,45 +96,6 @@ func TestPatternSearcher(t *testing.T) {
 				t.Fail()
 			}
 		}
-	}
-}
-
-func TestAnagrams(t *testing.T) {
-	dawg, err := New(anagramWords)
-	if err != nil {
-		t.Fatal(err)
-	}
-	expectedResult := [][]byte{[]byte("post"), []byte("pots"), []byte("spot"), []byte("stop"), []byte("tops")}
-	result := dawg.Anagrams([]byte("post"), 0)
-	if len(result) != len(expectedResult) {
-		t.Fail()
-	} else {
-		for i := range result {
-			if bytes.Equal(result[i], expectedResult[i]) == false {
-				t.Fail()
-			}
-		}
-	}
-	result = dawg.Anagrams([]byte{112, 111, 0, 0}, 0)
-	if len(result) != len(expectedResult) {
-		t.Fail()
-	} else {
-		for i := range result {
-			if bytes.Equal(result[i], expectedResult[i]) == false {
-				t.Fail()
-			}
-		}
-	}
-
-	result = dawg.Anagrams([]byte{112, 113, 0, 0}, 0)
-	if len(result) != 0 {
-		t.Log(result)
-		t.Fail()
-	}
-
-	result = dawg.Anagrams([]byte("ttps"), 0)
-	if len(result) != 1 {
-		t.Fatal(result)
 	}
 }
 
@@ -172,19 +105,20 @@ func TestAnagramSearcher(t *testing.T) {
 		t.Fatal(err)
 	}
 	expectedResult := [][]byte{[]byte("post"), []byte("pots"), []byte("spot"), []byte("stop"), []byte("tops")}
+	expectedIds := []int{3, 5, 7, 8, 9}
 	as := NewAnagramSearcher([]byte("post"), 0)
-	result := dawg.Search(as)
+	result, ids := dawg.Search(as)
 	if len(result) != len(expectedResult) {
 		t.Fail()
 	} else {
 		for i := range result {
-			if bytes.Equal(result[i], expectedResult[i]) == false {
+			if bytes.Equal(result[i], expectedResult[i]) == false || ids[i] != expectedIds[i] {
 				t.Fail()
 			}
 		}
 	}
 	as = NewAnagramSearcher([]byte{112, 111, 0, 0}, 0)
-	result = dawg.Search(as)
+	result, _ = dawg.Search(as)
 	if len(result) != len(expectedResult) {
 		t.Fail()
 	} else {
@@ -196,14 +130,14 @@ func TestAnagramSearcher(t *testing.T) {
 	}
 
 	as = NewAnagramSearcher([]byte{112, 113, 0, 0}, 0)
-	result = dawg.Search(as)
+	result, _ = dawg.Search(as)
 	if len(result) != 0 {
 		t.Log(result)
 		t.Fail()
 	}
 
 	as = NewAnagramSearcher([]byte("ttps"), 0)
-	result = dawg.Search(as)
+	result, _ = dawg.Search(as)
 	if len(result) != 1 {
 		t.Fatal(result)
 	}
@@ -218,7 +152,7 @@ func TestAnagramPattern(t *testing.T) {
 	expectedResult := [][]byte{[]byte("tops")}
 	as := NewAnagramSearcher([]byte("o???"), 63)
 	ps := NewPatternSearcher([]byte("t?ps"), 63)
-	result := dawg.Search(as, ps)
+	result, _ := dawg.Search(as, ps)
 	if len(result) != len(expectedResult) {
 		t.Fail()
 	} else {
@@ -297,7 +231,7 @@ func BenchmarkNew(b *testing.B) {
 	}
 }
 
-func BenchmarkContains(b *testing.B) {
+func BenchmarkLookup(b *testing.B) {
 	dawg, err := crossWord()
 	if err != nil {
 		b.Fatal(err)
@@ -305,7 +239,7 @@ func BenchmarkContains(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		dawg.Contains([]byte("alerting"))
+		dawg.Lookup([]byte("alerting"))
 	}
 }
 
@@ -317,7 +251,8 @@ func BenchmarkPattern(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		dawg.Pattern([]byte("al???ing"), 63)
+		ps := NewPatternSearcher([]byte("al???ing"), 63)
+		dawg.Search(ps)
 	}
 }
 
@@ -332,12 +267,10 @@ func BenchmarkAnagram(b *testing.B) {
 	for _, s := range testStrings {
 		b.Run(s, func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				dawg.Anagrams([]byte(s), 63)
+				as := NewAnagramSearcher([]byte(s), 63)
+				dawg.Search(as)
 			}
 		})
-	}
-	for i := 0; i < b.N; i++ {
-		dawg.Anagrams([]byte("?top"), 63)
 	}
 }
 

@@ -9,19 +9,21 @@ type Searcher interface {
 	Backstep()
 
 	AllowWord() bool
+	Chosen()
 }
 
 //Search is used to find words which are accepted by all searchers simultaneously.
-func (t *Dawg) Search(searchers ...Searcher) [][]byte {
-	solns := make([][]byte, 0)
+//It returns the solutions as words and also the indices of the words in lexicographic order.
+func (t *Dawg) Search(searchers ...Searcher) (solns [][]byte, ids []int) {
 	currDecisions := make([]int, 1)
 	currDecisions[0] = -1
 	currDawgs := make([]*Dawg, 1)
 	currDawgs[0] = t
 	currWord := make([]byte, 0)
-toCheckLoop:
-	for true {
-		//Do we allow this word?
+	index := -1
+
+	if t.final {
+		index++
 		allow := true
 		for _, srch := range searchers {
 			if srch.AllowWord() != true {
@@ -29,11 +31,20 @@ toCheckLoop:
 				break
 			}
 		}
+
 		if allow {
 			tmpWord := make([]byte, len(currWord))
 			copy(tmpWord, currWord)
 			solns = append(solns, tmpWord)
+			ids = append(ids, index)
+			for _, srch := range searchers {
+				srch.Chosen()
+			}
 		}
+	}
+
+toCheckLoop:
+	for true {
 		//Let's check if we can move from here.
 		currDawg := currDawgs[len(currDawgs)-1]
 		for j := currDecisions[len(currDecisions)-1] + 1; j < len(currDawg.linkLabels); j++ {
@@ -46,6 +57,7 @@ toCheckLoop:
 				}
 			}
 			if !allowStep {
+				index += currDawg.links[j].numWords
 				continue
 			}
 			for i := range searchers {
@@ -55,12 +67,35 @@ toCheckLoop:
 			currDawgs = append(currDawgs, currDawg.links[j])
 			currDecisions[len(currDecisions)-1] = j
 			currDecisions = append(currDecisions, -1)
+
+			//Do we allow this new word?
+			newDawg := currDawg.links[j]
+			if newDawg.final {
+				index++
+				allow := true
+				for _, srch := range searchers {
+					if srch.AllowWord() != true {
+						allow = false
+						break
+					}
+				}
+
+				if allow {
+					tmpWord := make([]byte, len(currWord))
+					copy(tmpWord, currWord)
+					solns = append(solns, tmpWord)
+					ids = append(ids, index)
+					for _, srch := range searchers {
+						srch.Chosen()
+					}
+				}
+			}
 			continue toCheckLoop
 		}
 		//Now we go back
 		//Can we go back?
 		if len(currWord) == 0 {
-			return solns
+			return solns, ids
 		}
 		currWord = currWord[:len(currWord)-1]
 		currDecisions = currDecisions[:len(currDecisions)-1]
@@ -71,7 +106,7 @@ toCheckLoop:
 		}
 	}
 	//We can never return here
-	return solns
+	return solns, ids
 }
 
 //PatternSearcher searches the dawg for words where each letter matches the letter in the pattern except in the positions of  the pattern which contain a blank.
@@ -109,6 +144,9 @@ func (p PatternSearcher) AllowWord() bool {
 	}
 	return false
 }
+
+//Chosen notifies the searcher that the current position has been chosen as a valid word.
+func (p PatternSearcher) Chosen() {}
 
 //NewPatternSearcher returns a pattern searcher for searching with the given pattern and blank.
 func NewPatternSearcher(pattern []byte, blank byte) *PatternSearcher {
@@ -176,6 +214,9 @@ func (p AnagramSearcher) AllowWord() bool {
 	}
 	return false
 }
+
+//Chosen notifies the searcher that the current position has been chosen as a valid word.
+func (p AnagramSearcher) Chosen() {}
 
 //NewAnagramSearcher returns an anagram searcher to find anagrams of a word in a dawg with blanks.
 func NewAnagramSearcher(anagram []byte, blank byte) *AnagramSearcher {

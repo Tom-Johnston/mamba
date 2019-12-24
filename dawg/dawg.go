@@ -3,14 +3,16 @@ package dawg
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"math/bits"
 	"sort"
 )
 
-//Dawg is a directed acyclic word graph (also known as a deterministic acyclic finite state automaton) is a data structure for storing a set of []byte in an efficient manner which is still easy to query.
+//Dawg is a directed acyclic word graph (also known as a deterministic acyclic finite state automaton) is a data structure for storing a set of []byte in efficiently while still being easy to query.
 type Dawg struct {
 	id         uint64 //This is useful for operations which want to visit each node once and don't care about the path used to reach a node. Every node should have a unique ID but the code doesn't assume they are numbered 0, 1, 2... even though this currently happens in practice.
+	numWords   int
 	final      bool
 	linkLabels []byte
 	links      []*Dawg
@@ -32,7 +34,7 @@ func (db *Builder) Initialise() {
 	db.d = &Dawg{id: 0}
 	db.lastID = 0
 	db.register = []*Dawg{}
-	db.lastWord = []byte{}
+	db.lastWord = nil
 	db.done = false
 }
 
@@ -47,7 +49,8 @@ func (db *Builder) Add(b []byte) error {
 		return errors.New("DawgBuilder has already finished")
 	}
 
-	if bytes.Compare(db.lastWord, b) != -1 {
+	if db.lastWord != nil && bytes.Compare(db.lastWord, b) != -1 {
+		fmt.Println(db.lastWord, b)
 		return errors.New("byte slices must be added in lexicographical order")
 	}
 
@@ -133,164 +136,14 @@ type letterCount struct {
 	count  int
 }
 
-//Pattern returns the words in the dawg where each letter matches the letter in word except in the positions of word which contain a blank.
-func (t *Dawg) Pattern(word []byte, blank byte) [][]byte {
-	patterns := make([][]byte, 0)
-	currDecisions := make([]int, 1, len(word))
-	currDecisions[0] = -1
-	currDawgs := make([]*Dawg, 1, len(word))
-	currDawgs[0] = t
-	currWord := make([]byte, 0, len(word))
-toCheckLoop:
-	for true {
-		index := len(currWord)
-		currDawg := currDawgs[len(currDawgs)-1]
-		if len(currWord) == len(word) {
-			if currDawg.final {
-				tmpWord := make([]byte, len(currWord))
-				copy(tmpWord, currWord)
-				patterns = append(patterns, tmpWord)
-			}
-		} else {
-			for j := currDecisions[len(currDecisions)-1] + 1; j < len(currDawg.linkLabels); j++ {
-				l := currDawg.linkLabels[j]
-				if word[index] == l || word[index] == blank {
-					currWord = append(currWord, l)
-					currDawgs = append(currDawgs, currDawg.links[j])
-					currDecisions[len(currDecisions)-1] = j
-					currDecisions = append(currDecisions, -1)
-					continue toCheckLoop
-				}
-			}
-		}
-		//Now we go back
-		//Can we go back?
-		if len(currWord) == 0 {
-			return patterns
-		}
-		currWord = currWord[:len(currWord)-1]
-		currDecisions = currDecisions[:len(currDecisions)-1]
-		currDawgs = currDawgs[:len(currDawgs)-1]
-	}
-	//We can never return here
-	return patterns
-}
-
-//Anagrams returns the words in the dawg which have the same multiset of letters as the variable letters. Any letters with the value blank are assumed to be wildcards and match any letter.
-func (t *Dawg) Anagrams(letters []byte, blank byte) [][]byte {
-	tmp := make([]byte, len(letters))
-	copy(tmp, letters)
-	sort.Slice(tmp, func(i, j int) bool { return letters[i] < letters[j] })
-	counts := make([]letterCount, 0)
-	blanks := 0
-	for i, l := range tmp {
-		if l == blank {
-			blanks++
-			continue
-		}
-		if i > 1 && tmp[i-1] == tmp[i] {
-			counts[len(counts)-1].count++
-		} else {
-			counts = append(counts, letterCount{letter: l, count: 1})
-		}
-	}
-	anagrams := make([][]byte, 0)
-	currDecisions := make([]int, 1, len(letters))
-	currDecisions[0] = -1
-	currPath := make([]byte, 0, len(letters))
-	currDawgs := make([]*Dawg, 1, len(letters))
-	currDawgs[0] = t
-	word := make([]byte, 0, len(letters))
-toCheckLoop:
-	for true {
-		currDawg := currDawgs[len(currDawgs)-1]
-		if len(word) == len(letters) {
-			if currDawg.final {
-				tmpWord := make([]byte, len(word))
-				copy(tmpWord, word)
-				anagrams = append(anagrams, tmpWord)
-			}
-		} else {
-			for j := currDecisions[len(currDecisions)-1] + 1; j < len(currDawg.linkLabels); j++ {
-				l := currDawg.linkLabels[j]
-				for i := range counts {
-					if counts[i].letter == l && counts[i].count > 0 {
-						counts[i].count--
-						word = append(word, l)
-						currPath = append(currPath, l)
-						currDawgs = append(currDawgs, currDawg.links[j])
-						currDecisions[len(currDecisions)-1] = j
-						currDecisions = append(currDecisions, -1)
-						continue toCheckLoop
-					}
-				}
-				if blanks > 0 {
-					blanks--
-					word = append(word, l)
-					currPath = append(currPath, blank)
-					currDawgs = append(currDawgs, currDawg.links[j])
-					currDecisions[len(currDecisions)-1] = j
-					currDecisions = append(currDecisions, -1)
-					continue toCheckLoop
-				}
-			}
-		}
-		//Now we go back
-		//Can we go back?
-		if len(word) == 0 {
-			return anagrams
-		}
-		word = word[:len(word)-1]
-		pathElem := currPath[len(currPath)-1]
-		if pathElem == blank {
-			blanks++
-		} else {
-			for i := range counts {
-				if counts[i].letter == pathElem {
-					counts[i].count++
-					break
-				}
-			}
-		}
-		currPath = currPath[:len(currPath)-1]
-		currDecisions = currDecisions[:len(currDecisions)-1]
-		currDawgs = currDawgs[:len(currDawgs)-1]
-	}
-	//We can never return here
-	return anagrams
-}
-
 //NumberOfWords returns the number of words stored in the dawg.
 func (t *Dawg) NumberOfWords() int {
-	numWords := 0
-	currDecisions := make([]int, 1, 1)
-	currDecisions[0] = -1
-	currDawgs := make([]*Dawg, 1, 1)
-	currDawgs[0] = t
-toCheckLoop:
-	for true {
-		currDawg := currDawgs[len(currDawgs)-1]
-		for j := currDecisions[len(currDecisions)-1] + 1; j < len(currDawg.linkLabels); j++ {
-
-			currDawgs = append(currDawgs, currDawg.links[j])
-			if currDawg.links[j].final {
-				numWords++
-			}
-			currDecisions[len(currDecisions)-1] = j
-			currDecisions = append(currDecisions, -1)
-			continue toCheckLoop
-		}
-		currDecisions = currDecisions[:len(currDecisions)-1]
-		currDawgs = currDawgs[:len(currDawgs)-1]
-		if len(currDawgs) == 0 {
-			return numWords
-		}
-	}
-	return numWords
+	return t.numWords
 }
 
 func (t *Dawg) commonPrefix(letters []byte) (prefix []byte, suffix []byte, dawg *Dawg) {
 	dawg = t
+	dawg.numWords++
 	i := 0
 	//TODO binary search here
 letter:
@@ -298,6 +151,7 @@ letter:
 		for j, link := range dawg.linkLabels {
 			if link == letters[i] {
 				dawg = dawg.links[j]
+				dawg.numWords++
 				continue letter
 			}
 		}
@@ -310,21 +164,33 @@ letter:
 	return prefix, suffix, dawg
 }
 
-//Contains returns if the dawg contains the given word.
-func (t *Dawg) Contains(word []byte) bool {
+//Lookup returns the id of the node where the given word ends if it is present and a boolean representing indicating if the word is in the dawg.
+func (t *Dawg) Lookup(word []byte) (int, bool) {
 	dawg := t
+	index := -1 //To find the index we need to count the number of words we see up to and including this word.
+	if dawg.final {
+		index++
+	}
 	//TODO Maybe binary search here
 letter:
 	for _, l := range word {
 		for j, link := range dawg.linkLabels {
 			if link == l {
 				dawg = dawg.links[j]
+				if dawg.final {
+					index++
+				}
 				continue letter
+			} else {
+				index += dawg.links[j].numWords
 			}
 		}
-		return false
+		return 0, false
 	}
-	return dawg.final
+	if dawg.final {
+		return index, true
+	}
+	return 0, false
 }
 
 func replaceOrRegister(t *Dawg, register []*Dawg) []*Dawg {
@@ -372,7 +238,7 @@ func (t *Dawg) addSuffix(suffix []byte, lastID uint64) uint64 {
 		currDawg.linkLabels = append(currDawg.linkLabels, b)
 		tmpLinks := make([]*Dawg, 0)
 		tmpLinkLabels := make([]byte, 0)
-		tmpDawg := &Dawg{id: lastID, final: false, linkLabels: tmpLinkLabels, links: tmpLinks}
+		tmpDawg := &Dawg{id: lastID, numWords: 1, final: false, linkLabels: tmpLinkLabels, links: tmpLinks}
 		currDawg.links = append(currDawg.links, tmpDawg)
 		currDawg = tmpDawg
 	}
@@ -413,6 +279,9 @@ func (t *Dawg) GobEncode() ([]byte, error) {
 	buf = encodeUint64(convertID(t.id), buf)
 	b = append(b, buf...)
 
+	buf = encodeUint64(uint64(t.numWords), buf)
+	b = append(b, buf...)
+
 	if t.final {
 		b = append(b, 1)
 	} else {
@@ -447,6 +316,9 @@ toCheckLoop:
 				numEdges += len(linkDawg.links)
 
 				buf = encodeUint64(convertID(linkID), buf)
+				b = append(b, buf...)
+
+				buf = encodeUint64(uint64(linkDawg.numWords), buf)
 				b = append(b, buf...)
 
 				if linkDawg.final {
@@ -502,6 +374,14 @@ func (t *Dawg) GobDecode(b []byte) error {
 		if err != nil {
 			return err
 		}
+
+		numWords, _, err := decodeUint64(r, buf)
+		if err != nil {
+			return err
+		}
+
+		ts[indexID].numWords = int(numWords)
+
 		final, err := r.ReadByte()
 		if err != nil {
 			return err
