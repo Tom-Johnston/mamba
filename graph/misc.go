@@ -47,55 +47,6 @@ func UnrankCombination(rank, k int) []int {
 	return comb
 }
 
-//Permutations
-
-//This
-
-//PermutationIterator is a struct containing the state of the iterator.
-type PermutationIterator struct {
-	n int
-	i int
-	c []int
-	p []int
-}
-
-//NewPermutation returns a new permuation iterator which iterates over all permutations of the elements in a.
-//This doesn't modify a.
-func NewPermutation(a []int) *PermutationIterator {
-	copyOfA := make([]int, len(a))
-	copy(copyOfA, a)
-	p := PermutationIterator{i: -1, n: len(a), c: make([]int, len(a)), p: copyOfA}
-	return &p
-}
-
-//Next returns the next permutation if there is one and nil if there are no further permuations.
-func (p *PermutationIterator) Next() []int {
-	if p.i == p.n {
-		return nil
-	}
-
-	if p.i == -1 {
-		p.i++
-		return p.p
-	}
-
-	for p.i < p.n {
-		if p.c[p.i] < p.i {
-			if p.i%2 == 0 {
-				p.p[0], p.p[p.i] = p.p[p.i], p.p[0]
-			} else {
-				p.p[p.c[p.i]], p.p[p.i] = p.p[p.i], p.p[p.c[p.i]]
-			}
-			p.c[p.i]++
-			p.i = 0
-			return p.p
-		}
-		p.c[p.i] = 0
-		p.i++
-	}
-	return nil
-}
-
 //Helper functions on []int
 
 func intsSum(a []int) (sum int) {
