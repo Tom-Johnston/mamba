@@ -4,6 +4,7 @@ import (
 	"runtime"
 	"sort"
 
+	"github.com/Tom-Johnston/gigraph/comb"
 	"github.com/Tom-Johnston/gigraph/disjoint"
 	. "github.com/Tom-Johnston/gigraph/graph"
 )
@@ -92,21 +93,21 @@ func getAugmentations(g *DenseGraph, augs [][]int) [][]int {
 	}
 	_, _, generators := CanonicalIsomorphCustom(g, f, 1, OrderedPartition{Order: order, BinSizes: []int{n}, Path: []int{}, SplitPoint: 0})
 	for k := 0; k <= maxSize; k++ {
-		ds := disjoint.New(BinomialCoeffSingle(n, k))
+		ds := disjoint.New(comb.Coeff(n, k))
 		for i := 0; i < len(ds); i++ {
-			c := UnrankCombination(i, k)
+			c := comb.Unrank(i, k)
 			c2 := make([]int, k)
 			for _, g := range generators {
 				for j := 0; j < k; j++ {
 					c2[j] = g[c[j]]
 				}
 				sort.Ints(c2)
-				ds.Union(i, RankCombination(c2))
+				ds.Union(i, comb.Rank(c2))
 			}
 		}
 		for i := 0; i < len(ds); i++ {
 			if ds[i] < 0 {
-				augs = append(augs, UnrankCombination(i, k))
+				augs = append(augs, comb.Unrank(i, k))
 			}
 		}
 	}

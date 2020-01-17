@@ -3,6 +3,7 @@ package graph
 import (
 	"math/rand"
 
+	"github.com/Tom-Johnston/gigraph/comb"
 	"github.com/Tom-Johnston/gigraph/sortints"
 )
 
@@ -195,12 +196,12 @@ func FoldedHypercubeGraph(dim int) *DenseGraph {
 //KneserGraph returns the Kneser graph with parameters n and k. It has a vertex for each unordered subset of {0,...,n-1} of size k and an edge between two subsets if they are disjoint.
 //The subsets are ordered in co-lexicographic.
 func KneserGraph(n, k int) *DenseGraph {
-	N := BinomialCoeffSingle(n, k)
+	N := comb.Coeff(n, k)
 	g := NewDense(N, nil)
 	for i := 0; i < N; i++ {
-		combi := UnrankCombination(i, k)
+		combi := comb.Unrank(i, k)
 		for j := i; j < N; j++ {
-			combj := UnrankCombination(j, k)
+			combj := comb.Unrank(j, k)
 			if sortints.IntersectionSize(combi, combj) == 0 {
 				g.AddEdge(i, j)
 			}
@@ -211,12 +212,17 @@ func KneserGraph(n, k int) *DenseGraph {
 
 //BipartiteKneserGraph returns the a bipartite graph vertices [n]^{(k)} on one side and [n]^{(n-k)} on the other and an edge between two sets if they are on different sides and one is a subset of the other.
 func BipartiteKneserGraph(n, k int) *DenseGraph {
-	N := BinomialCoeffSingle(n, k)
-	g := NewDense(2*N, nil)
+	N := comb.Coeff(n, k)
+	size, overflow := addHasOverflowed(N, N)
+	if overflow {
+		panic("calculating the size of the graph overflows int")
+	}
+
+	g := NewDense(size, nil)
 	for i := 0; i < N; i++ {
-		combi := UnrankCombination(i, k)
+		combi := comb.Unrank(i, k)
 		for j := 0; j < N; j++ {
-			combj := UnrankCombination(j, n-k)
+			combj := comb.Unrank(j, n-k)
 			if sortints.IntersectionSize(combi, combj) == k {
 				g.AddEdge(i, N+j)
 			}

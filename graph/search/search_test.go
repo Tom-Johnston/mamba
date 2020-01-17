@@ -14,7 +14,7 @@ func TestAll(t *testing.T) {
 		output := make(chan *DenseGraph, 1)
 		go All(size, output, 0, 1)
 
-		for _ = range output {
+		for range output {
 			numberFound[size]++
 		}
 	}
@@ -32,7 +32,7 @@ func TestAllParallel(t *testing.T) {
 		output := make(chan *DenseGraph, 1)
 		go AllParallel(size, output)
 
-		for _ = range output {
+		for range output {
 			numberFound[size]++
 		}
 	}
