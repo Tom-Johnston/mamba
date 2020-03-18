@@ -48,6 +48,15 @@ func TestChromaticNumber(t *testing.T) {
 			t.Fail()
 		}
 	}
+
+	g, err := graph.Graph6Decode("KlWW[EHD_BsC")
+	if err != nil {
+		t.Error(err)
+	}
+	cn, _ := graph.ChromaticNumber(g)
+	if cn != 3 {
+		t.Fail()
+	}
 }
 
 // k  | n=  1  2  3  4   5   6    7     8       9       10
