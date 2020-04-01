@@ -4,6 +4,7 @@ import (
 	"sort"
 
 	"github.com/Tom-Johnston/gigraph/disjoint"
+	"github.com/Tom-Johnston/gigraph/ints"
 )
 
 //OrderedPartition is a wrapper containing the information of an ordered partition and the path that the CanonicalIsomorph function used to reach the partition.
@@ -103,7 +104,7 @@ func equitableRefinementProcedure(g Graph, op OrderedPartition, edgeColours func
 				currentBinSize := 1
 				sort.Sort(tmp)
 				for k := 1; k < len(tmp); k++ {
-					if IntsEqual(tmp[k-1].degrees, tmp[k].degrees) {
+					if ints.Equal(tmp[k-1].degrees, tmp[k].degrees) {
 						currentBinSize++
 					} else {
 						newBinSizes = append(newBinSizes, currentBinSize)
@@ -386,7 +387,7 @@ loop:
 	for len(toCheck) > 0 {
 
 		op, toCheck = toCheck[len(toCheck)-1], toCheck[:len(toCheck)-1]
-		if len(op.Path) > 1 && IntsHasPrefix(firstLeafPath, op.Path[:len(op.Path)-1]) {
+		if len(op.Path) > 1 && ints.HasPrefix(firstLeafPath, op.Path[:len(op.Path)-1]) {
 			y := firstLeafOrbits.Find(op.Order[op.SplitPoint])
 			index := op.SplitPoint + op.BinSizes[op.SplitPoint+1]
 			for i := 0; i < op.BinSizes[op.SplitPoint+1]-op.Path[len(op.Path)-1]; i++ {
@@ -395,7 +396,7 @@ loop:
 				}
 				index--
 			}
-		} else if len(op.Path) > 1 && IntsHasPrefix(currentBestPath, op.Path[:len(op.Path)-1]) {
+		} else if len(op.Path) > 1 && ints.HasPrefix(currentBestPath, op.Path[:len(op.Path)-1]) {
 
 			y := currentBestOrbits.Find(op.Order[op.SplitPoint])
 			index := op.SplitPoint + op.BinSizes[op.SplitPoint+1]
@@ -434,7 +435,7 @@ loop:
 					}
 				}
 				for len(toCheck) > 0 {
-					if !IntsHasPrefix(toCheck[len(toCheck)-1].Path, op.Path[:index+1]) {
+					if !ints.HasPrefix(toCheck[len(toCheck)-1].Path, op.Path[:index+1]) {
 						break
 					}
 					toCheck = toCheck[:len(toCheck)-1]
@@ -475,7 +476,7 @@ loop:
 					}
 				}
 				for len(toCheck) > 0 {
-					if !IntsHasPrefix(toCheck[len(toCheck)-1].Path, op.Path[:index+1]) {
+					if !ints.HasPrefix(toCheck[len(toCheck)-1].Path, op.Path[:index+1]) {
 						break
 					}
 					toCheck = toCheck[:len(toCheck)-1]

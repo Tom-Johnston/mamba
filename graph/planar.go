@@ -3,6 +3,7 @@ package graph
 import (
 	"sort"
 
+	"github.com/Tom-Johnston/gigraph/ints"
 	"github.com/Tom-Johnston/gigraph/sortints"
 )
 
@@ -357,8 +358,8 @@ func IsPlanar(g Graph) bool {
 									if w == attachA {
 										newFaceA = append(newFaceA, seenVertices[1:len(seenVertices)-1]...)
 									} else {
-										newFaceA = append(newFaceA, IntsReverse(seenVertices[1:len(seenVertices)-1])...)
-										IntsReverse(seenVertices[1 : len(seenVertices)-1])
+										newFaceA = append(newFaceA, ints.Reverse(seenVertices[1:len(seenVertices)-1])...)
+										ints.Reverse(seenVertices[1 : len(seenVertices)-1])
 									}
 								}
 							}
@@ -368,7 +369,7 @@ func IsPlanar(g Graph) bool {
 						if newFaceB[0] == attachB {
 							newFaceB = append(newFaceB, seenVertices[1:len(seenVertices)-1]...)
 						} else {
-							newFaceB = append(newFaceB, IntsReverse(seenVertices[1:len(seenVertices)-1])...)
+							newFaceB = append(newFaceB, ints.Reverse(seenVertices[1:len(seenVertices)-1])...)
 						}
 						//fmt.Println(newFaceA, newFaceB)
 						//Add the new faces to the list of HF.

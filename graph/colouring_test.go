@@ -5,6 +5,7 @@ import (
 
 	"github.com/Tom-Johnston/gigraph/graph"
 	"github.com/Tom-Johnston/gigraph/graph/search"
+	"github.com/Tom-Johnston/gigraph/ints"
 )
 
 //From http://keithbriggs.info/cgt.html
@@ -24,7 +25,7 @@ import (
 // 11   0   0   0   0    0    0     0      0        0        0
 func TestChromaticNumber(t *testing.T) {
 	//truthData[n][k] contais the number of graphs of size n + 1 with chromatic numer k
-	truthData := make([][]int, 9)
+	truthData := make([][]int, 10)
 	truthData[0] = []int{0, 1}
 	truthData[1] = []int{0, 1, 1}
 	truthData[2] = []int{0, 1, 2, 1}
@@ -33,7 +34,8 @@ func TestChromaticNumber(t *testing.T) {
 	truthData[5] = []int{0, 1, 34, 84, 31, 5, 1}
 	truthData[6] = []int{0, 1, 87, 579, 318, 52, 6, 1}
 	truthData[7] = []int{0, 1, 302, 5721, 5366, 867, 81, 7, 1}
-	truthData[8] = []int{0, 1, 118, 87831, 155291, 28722, 2028, 118, 8, 1}
+	truthData[8] = []int{0, 1, 1118, 87381, 155291, 28722, 2028, 118, 8, 1}
+	truthData[9] = []int{0, 1, 5478, 2104349, 7855628, 1919895, 115391, 4251, 165, 9, 1}
 	for i := 1; i <= 8; i++ {
 		output := make(chan *graph.DenseGraph)
 		foundData := make([]int, i+1)
@@ -42,10 +44,10 @@ func TestChromaticNumber(t *testing.T) {
 			chromaticNumber, _ := graph.ChromaticNumber(g)
 			foundData[chromaticNumber]++
 		}
-		if !graph.IntsEqual(foundData, truthData[i-1]) {
+		if !ints.Equal(foundData, truthData[i-1]) {
 			t.Log(foundData)
-			t.Log(truthData)
-			t.Fail()
+			t.Log(truthData[i-1])
+			t.FailNow()
 		}
 	}
 
@@ -97,7 +99,7 @@ func TestChromaticIndex(t *testing.T) {
 			chromaticIndex, _ := graph.ChromaticIndex(g)
 			foundData[chromaticIndex]++
 		}
-		if !graph.IntsEqual(foundData, truthData[i-1]) {
+		if !ints.Equal(foundData, truthData[i-1]) {
 			t.Log(foundData)
 			t.Log(truthData)
 			t.Fail()
@@ -117,7 +119,7 @@ func TestChromaticPolynomial(t *testing.T) {
 			continue
 		}
 		cp := graph.ChromaticPolynomial(g)
-		if !graph.IntsEqual(cp, truthData[g6]) {
+		if !ints.Equal(cp, truthData[g6]) {
 			t.Fail()
 		}
 	}

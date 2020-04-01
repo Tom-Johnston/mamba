@@ -3,6 +3,7 @@ package graph
 import (
 	"sort"
 
+	"github.com/Tom-Johnston/gigraph/ints"
 	"github.com/Tom-Johnston/gigraph/sortints"
 )
 
@@ -43,7 +44,7 @@ func NewSparse(n int, neighbourhoods []sortints.SortedInts) *SparseGraph {
 		degreeSequence[i] = len(tmpNeighbourhoods[i])
 	}
 
-	return &SparseGraph{NumberOfVertices: n, NumberOfEdges: intsSum(degreeSequence) / 2, Neighbourhoods: tmpNeighbourhoods, DegreeSequence: degreeSequence}
+	return &SparseGraph{NumberOfVertices: n, NumberOfEdges: ints.Sum(degreeSequence) / 2, Neighbourhoods: tmpNeighbourhoods, DegreeSequence: degreeSequence}
 
 }
 

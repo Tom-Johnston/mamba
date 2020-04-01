@@ -2,6 +2,8 @@ package graph
 
 import (
 	"container/list"
+
+	"github.com/Tom-Johnston/gigraph/ints"
 )
 
 //Distance returns the length of the shortest path from i to j in g and -1 if there is no path
@@ -75,10 +77,10 @@ func Diameter(g Graph) int {
 		return 0
 	}
 	e := Eccentricity(g)
-	if IntsMin(e) == -1 {
+	if ints.Min(e) == -1 {
 		return -1
 	}
-	return IntsMax(Eccentricity(g))
+	return ints.Max(Eccentricity(g))
 }
 
 //Radius returns the raidus of a graph or -1 for a disconnected graph.
@@ -87,7 +89,7 @@ func Radius(g Graph) int {
 	if g.N() == 0 {
 		return 0
 	}
-	return IntsMin(Eccentricity(g))
+	return ints.Min(Eccentricity(g))
 }
 
 //Girth returns the size of the shortest cycle in g.

@@ -1,6 +1,10 @@
 package graph
 
-import "sort"
+import (
+	"sort"
+
+	"github.com/Tom-Johnston/gigraph/ints"
+)
 
 //ConnectedComponent returns the connected component in g containing v.
 func ConnectedComponent(g Graph, v int) []int {
@@ -245,7 +249,7 @@ func Degeneracy(g Graph) (d int, order []int) {
 		return 0, nil
 	}
 	degreeSequence := g.Degrees()
-	maxDegree := IntsMax(degreeSequence)
+	maxDegree := ints.Max(degreeSequence)
 
 	//Initialise the degeneracy and an optimum ordering.
 	d = 0

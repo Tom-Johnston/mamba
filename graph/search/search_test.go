@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	. "github.com/Tom-Johnston/gigraph/graph"
+	"github.com/Tom-Johnston/gigraph/ints"
 )
 
 func TestAll(t *testing.T) {
@@ -19,7 +20,7 @@ func TestAll(t *testing.T) {
 		}
 	}
 	t.Log(numberFound)
-	if !IntsEqual(numberFound, truthData[:maxSize+1]) {
+	if !ints.Equal(numberFound, truthData[:maxSize+1]) {
 		t.Fail()
 	}
 }
@@ -37,7 +38,7 @@ func TestAllParallel(t *testing.T) {
 		}
 	}
 	t.Log(numberFound)
-	if !IntsEqual(numberFound, truthData[:maxSize+1]) {
+	if !ints.Equal(numberFound, truthData[:maxSize+1]) {
 		t.Fail()
 	}
 }

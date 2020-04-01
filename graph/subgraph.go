@@ -3,6 +3,7 @@ package graph
 import (
 	"sort"
 
+	"github.com/Tom-Johnston/gigraph/ints"
 	"github.com/Tom-Johnston/gigraph/sortints"
 )
 
@@ -269,7 +270,7 @@ func (h inducedSubgraph) Degrees() []int {
 
 func (h inducedSubgraph) M() int {
 	degrees := h.Degrees()
-	sum := intsSum(degrees)
+	sum := ints.Sum(degrees)
 	return sum / 2
 }
 

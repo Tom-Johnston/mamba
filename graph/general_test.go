@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/Tom-Johnston/gigraph/graph/search"
+	"github.com/Tom-Johnston/gigraph/ints"
 	"github.com/Tom-Johnston/gigraph/sortints"
 
 	"github.com/Tom-Johnston/gigraph/graph"
@@ -42,7 +43,7 @@ func TestDegeneracy(t *testing.T) {
 			}
 			foundData[d]++
 		}
-		if !graph.IntsEqual(foundData, truthData[i]) {
+		if !ints.Equal(foundData, truthData[i]) {
 			t.Log(foundData)
 			t.Log(truthData)
 			t.Fail()
@@ -64,7 +65,7 @@ func TestBiconnectedComponents(t *testing.T) {
 			}
 		}
 	}
-	if !graph.IntsEqual(foundData, truthData[:maxSize+1]) {
+	if !ints.Equal(foundData, truthData[:maxSize+1]) {
 		t.Log(foundData)
 		t.Log(truthData[:maxSize+1])
 		t.Fail()

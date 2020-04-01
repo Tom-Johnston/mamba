@@ -5,6 +5,7 @@ import (
 
 	"github.com/Tom-Johnston/gigraph/graph"
 	"github.com/Tom-Johnston/gigraph/graph/search"
+	"github.com/Tom-Johnston/gigraph/ints"
 )
 
 //The truth data was generated using the function but while there were other tests.
@@ -30,7 +31,7 @@ func TestGirth(t *testing.T) {
 				foundData[girth]++
 			}
 		}
-		if !graph.IntsEqual(foundData, truthData[i]) {
+		if !ints.Equal(foundData, truthData[i]) {
 			t.Log(foundData)
 			t.Log(truthData)
 			t.Fail()
@@ -75,7 +76,7 @@ func TestDiameter(t *testing.T) {
 				foundData[diam]++
 			}
 		}
-		if !graph.IntsEqual(foundData, truthData[i]) {
+		if !ints.Equal(foundData, truthData[i]) {
 			t.Log(foundData)
 			t.Log(truthData)
 			t.Fail()
@@ -130,7 +131,7 @@ func TestRadius(t *testing.T) {
 				foundData[diam]++
 			}
 		}
-		if !graph.IntsEqual(foundData, truthData[i]) {
+		if !ints.Equal(foundData, truthData[i]) {
 			t.Log(foundData)
 			t.Log(truthData)
 			t.Fail()

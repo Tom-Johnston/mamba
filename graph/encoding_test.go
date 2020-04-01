@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/Tom-Johnston/gigraph/graph"
+	"github.com/Tom-Johnston/gigraph/ints"
 )
 
 func TestSparse6Encode(t *testing.T) {
@@ -46,7 +47,7 @@ func TestSparse6Decode(t *testing.T) {
 func TestPruferEncode(t *testing.T) {
 	g := graph.NewDense(6, []byte{0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1})
 	code := []int{3, 3, 3, 4}
-	if c := graph.PruferEncode(g); !graph.IntsEqual(c, code) {
+	if c := graph.PruferEncode(g); !ints.Equal(c, code) {
 		t.Logf("Found: %v Expected: %v", c, code)
 		t.Fail()
 	}

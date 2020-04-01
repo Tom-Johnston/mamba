@@ -5,6 +5,7 @@ import (
 
 	"github.com/Tom-Johnston/gigraph/graph"
 	"github.com/Tom-Johnston/gigraph/graph/search"
+	"github.com/Tom-Johnston/gigraph/ints"
 )
 
 func TestPlanarGraph(t *testing.T) {
@@ -21,7 +22,7 @@ func TestPlanarGraph(t *testing.T) {
 			}
 		}
 	}
-	if !graph.IntsEqual(foundData, truthData[:maxSize+1]) {
+	if !ints.Equal(foundData, truthData[:maxSize+1]) {
 		t.Log(foundData)
 		t.Log(truthData[:maxSize+1])
 		t.Fail()

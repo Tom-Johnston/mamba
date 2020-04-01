@@ -1,8 +1,12 @@
 package graph_test
 
-import "testing"
-import "github.com/Tom-Johnston/gigraph/graph"
-import "github.com/Tom-Johnston/gigraph/graph/search"
+import (
+	"testing"
+
+	"github.com/Tom-Johnston/gigraph/graph"
+	"github.com/Tom-Johnston/gigraph/graph/search"
+	"github.com/Tom-Johnston/gigraph/ints"
+)
 
 func TestCliqueNumber(t *testing.T) {
 	//Check the number of graphs on vertices with each clique number. This includes the empty graph.
@@ -25,7 +29,7 @@ func TestCliqueNumber(t *testing.T) {
 		for g := range output {
 			foundData[graph.CliqueNumber(g)]++
 		}
-		if !graph.IntsEqual(foundData, truthData[i]) {
+		if !ints.Equal(foundData, truthData[i]) {
 			t.Log(foundData)
 			t.Log(truthData)
 			t.Fail()
