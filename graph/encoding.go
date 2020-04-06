@@ -13,6 +13,7 @@ const maxInt = int(maxUint >> 1)
 
 //Graph6Decode returns the graph with Graph6 encoding s or an error.
 //For the definition of the format see: https://users.cecs.anu.edu.au/~bdm/data/formats.txt
+//The empty string decodes as the empty graph.
 func Graph6Decode(s string) (*DenseGraph, error) {
 	//Check the bytes are in 63-126 (inclusive). This could be done during decoding but it is neater to check here.
 	for i := 0; i < len(s); i++ {
@@ -23,6 +24,10 @@ func Graph6Decode(s string) (*DenseGraph, error) {
 
 	var n uint64
 	i := 0
+
+	if len(s) == 0 {
+		return NewDense(0, nil), nil
+	}
 
 	if s[0] != 126 {
 		n = uint64(s[0] - 63)
@@ -45,7 +50,7 @@ func Graph6Decode(s string) (*DenseGraph, error) {
 		}
 	}
 
-	if i+int(((n*(n-1))/2)-1)/6 > len(s) {
+	if i+int(((n*(n-1))/2)+5)/6 > len(s) {
 		return &DenseGraph{}, errors.New("String too short - unable to decode edges")
 	}
 

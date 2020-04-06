@@ -4,8 +4,28 @@ import (
 	"testing"
 
 	"github.com/Tom-Johnston/gigraph/graph"
+	"github.com/Tom-Johnston/gigraph/graph/search"
 	"github.com/Tom-Johnston/gigraph/ints"
 )
+
+func TestGraph6(t *testing.T) {
+	for i := 1; i <= 8; i++ {
+		output := make(chan *graph.DenseGraph)
+		go search.All(i, output, 0, 1)
+		for g := range output {
+			s := graph.Graph6Encode(g)
+			h, err := graph.Graph6Decode(s)
+			if err != nil {
+				t.Error(err)
+				t.FailNow()
+			}
+			if !graph.Equal(g, h) {
+				t.Logf("Graphs not equal")
+				t.FailNow()
+			}
+		}
+	}
+}
 
 func TestSparse6Encode(t *testing.T) {
 	testGraphs := [][]string{
