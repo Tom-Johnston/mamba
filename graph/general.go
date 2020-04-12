@@ -102,7 +102,7 @@ func BiconnectedComponents(g Graph) ([][]int, []int) {
 		isArticulation := make([]bool, n)
 
 		childCount := 0
-		bicoms := make([][]int, 1, 1)
+		bicoms := make([][]int, 1)
 		tmp := make([]int, 0, n)
 		bicoms[0] = tmp
 	DFS:
@@ -241,7 +241,7 @@ func Equal(g, h Graph) bool {
 	return true
 }
 
-//Degeneracy returns the smallest integer d such that every ordering of the vertices contains a vertex preceeded by at least d neighbours. It also returns an ordering where no vertex is proceeded by d + 1 neighbours.
+//Degeneracy returns the smallest integer d such that every ordering of the vertices contains a vertex preceded by at least d neighbours. It also returns an ordering where no vertex is proceeded by d + 1 neighbours.
 func Degeneracy(g Graph) (d int, order []int) {
 	//Extract the information.
 	n := g.N()

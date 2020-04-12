@@ -25,7 +25,7 @@ func AllParallel(n int, output chan *DenseGraph) {
 			count <- false
 		}()
 	}
-	for true {
+	for {
 		<-count
 		counter--
 		if counter == 0 {
@@ -70,12 +70,6 @@ func All(n int, output chan *DenseGraph, a int, m int) {
 		}
 	}
 	close(output)
-}
-
-func pruneAndOutput(gI interface{}, output chan interface{}) bool {
-	g := gI.(DenseGraph)
-	output <- g
-	return false
 }
 
 func getAugmentations(g *DenseGraph, augs [][]int) [][]int {
@@ -193,10 +187,7 @@ func isCanonical(g *DenseGraph, aug []int, h *DenseGraph) bool {
 	for _, u := range perm {
 		for _, v := range viable {
 			if u == v {
-				if orbits.Find(h.NumberOfVertices-1) == orbits.Find(u) {
-					return true
-				}
-				return false
+				return orbits.Find(h.NumberOfVertices-1) == orbits.Find(u)
 			}
 		}
 	}

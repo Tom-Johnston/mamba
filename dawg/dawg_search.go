@@ -26,7 +26,7 @@ func (t *Dawg) Search(searchers ...Searcher) (solns [][]byte, ids []int) {
 		index++
 		allow := true
 		for _, srch := range searchers {
-			if srch.AllowWord() != true {
+			if !srch.AllowWord() {
 				allow = false
 				break
 			}
@@ -44,14 +44,14 @@ func (t *Dawg) Search(searchers ...Searcher) (solns [][]byte, ids []int) {
 	}
 
 toCheckLoop:
-	for true {
+	for {
 		//Let's check if we can move from here.
 		currDawg := currDawgs[len(currDawgs)-1]
 		for j := currDecisions[len(currDecisions)-1] + 1; j < len(currDawg.linkLabels); j++ {
 			l := currDawg.linkLabels[j]
 			allowStep := true
 			for i := range searchers {
-				if searchers[i].AllowStep(l) != true {
+				if !searchers[i].AllowStep(l) {
 					allowStep = false
 					break
 				}
@@ -74,7 +74,7 @@ toCheckLoop:
 				index++
 				allow := true
 				for _, srch := range searchers {
-					if srch.AllowWord() != true {
+					if !srch.AllowWord() {
 						allow = false
 						break
 					}
@@ -105,8 +105,6 @@ toCheckLoop:
 			searchers[i].Backstep()
 		}
 	}
-	//We can never return here
-	return solns, ids
 }
 
 //PatternSearcher searches the dawg for words where each letter matches the letter in the pattern except in the positions of  the pattern which contain a blank.
@@ -139,10 +137,7 @@ func (p *PatternSearcher) Backstep() {
 
 //AllowWord checks if the current position is allowed as a matching word.
 func (p PatternSearcher) AllowWord() bool {
-	if p.index == len(p.pattern) {
-		return true
-	}
-	return false
+	return p.index == len(p.pattern)
 }
 
 //Chosen notifies the searcher that the current position has been chosen as a valid word.
@@ -209,10 +204,7 @@ func (p *AnagramSearcher) Backstep() {
 
 //AllowWord checks if the current position is allowed as a matching word.
 func (p AnagramSearcher) AllowWord() bool {
-	if p.targetLength == len(p.currPath) {
-		return true
-	}
-	return false
+	return p.targetLength == len(p.currPath)
 }
 
 //Chosen notifies the searcher that the current position has been chosen as a valid word.

@@ -67,8 +67,7 @@ func IsPlanar(g Graph) bool {
 					}
 					//fmt.Println("H1E", HE)
 					previous := v
-					for true {
-
+					for {
 						var e int
 						//fmt.Println(previous, parents[previous])
 						if previous < parents[previous] {
@@ -222,7 +221,6 @@ func IsPlanar(g Graph) bool {
 						e := (u*(u-1))/2 + v
 						E = append(E, e)
 					}
-
 				}
 			}
 			//We have finished exploring this HFragment I think. Week long break not helpful...
@@ -270,7 +268,7 @@ func IsPlanar(g Graph) bool {
 				parents[i] = -1
 			}
 		outerLoop:
-			for true { //We must find a path so len(toCheck) > 0 unnecessary
+			for { //We must find a path so len(toCheck) > 0 unnecessary
 				//fmt.Println(toCheck)
 				////fmt.Println(f)
 				if len(toCheck) == 0 {
@@ -298,13 +296,13 @@ func IsPlanar(g Graph) bool {
 						//We have a path
 						//Extract the path.
 						attachA := f.A[j]
-						attachB := f.A[0]
+						attachB := 0
 						//fmt.Println(attachB)
 						seenVertices := make([]int, 0, 2)
 						parents[f.A[j]] = v
 						parent := v
 						v = f.A[j]
-						for true {
+						for {
 							//fmt.Println("parent", parent, "v", v)
 							seenVertices = append(seenVertices, v)
 							if parent < v {
@@ -511,7 +509,6 @@ func IsPlanar(g Graph) bool {
 										e := (u*(u-1))/2 + v
 										E = append(E, e)
 									}
-
 								}
 							}
 							//We have finished exploring this HFragment I think. Week long break not helpful...

@@ -251,8 +251,6 @@ func ContainsSorted(a, b SortedInts) bool {
 			i++
 		}
 	}
-	if j < len(b) {
-		return false
-	}
-	return true
+
+	return j >= len(b)
 }

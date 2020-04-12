@@ -56,7 +56,7 @@ func Graph6Decode(s string) (*DenseGraph, error) {
 
 	edges := make([]uint8, (n*(n-1))/2)
 	for j := 0; j < len(edges); j++ {
-		edges[j] = (uint8(s[i+j/6]-63) & (1 << uint(5-(j%6)))) >> uint(5-(j%6))
+		edges[j] = ((s[i+j/6] - 63) & (1 << uint(5-(j%6)))) >> uint(5-(j%6))
 	}
 
 	return NewDense(int(n), edges), nil
@@ -153,9 +153,9 @@ func Sparse6Decode(s string) (*SparseGraph, error) {
 
 	g := NewSparse(int(n), nil)
 	v := 0
-	k := 64 - bits.LeadingZeros64(uint64(n-1))
+	k := 64 - bits.LeadingZeros64(n-1)
 	var bitIndex uint
-	for true {
+	for {
 		b := ((s[i] - 63) >> (5 - bitIndex)) & 1
 		bitIndex++
 		if bitIndex == 6 {
@@ -188,7 +188,6 @@ func Sparse6Decode(s string) (*SparseGraph, error) {
 			g.AddEdge(v, x)
 		}
 	}
-	return g, nil
 }
 
 //Sparse6Encode returns an encoding of g. Note that the encoding is not unique but this should align with the format used by showg, geng, nauty etc.
@@ -331,9 +330,7 @@ func Sparse6Encode(g Graph) string {
 						currentBitPosition = 0
 					}
 				}
-
 			}
-
 		}
 	}
 
@@ -479,7 +476,6 @@ func PruferDecode(p []int) *DenseGraph {
 				degrees[v]--
 				break
 			}
-
 		}
 	}
 	for i := 0; i < n; i++ {

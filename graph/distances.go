@@ -70,7 +70,7 @@ func Eccentricity(g Graph) []int {
 	return eccentricity
 }
 
-//Diameter retuns the diameter of a graph or -1 for a disconnected graph.
+//Diameter returns the diameter of a graph or -1 for a disconnected graph.
 //The diameter is the maximum eccentricity of the vertices of the graph i.e. it is the length of the longest shortest path in g.
 func Diameter(g Graph) int {
 	if g.N() == 0 {

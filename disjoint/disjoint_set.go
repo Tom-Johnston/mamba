@@ -24,7 +24,7 @@ func (dsPtr *Set) Find(x int) int {
 	}
 	currentPlace := x
 	seenNumbers := []int{x}
-	for true {
+	for {
 		if currentPlace = ds[currentPlace]; currentPlace < 0 {
 			tmp := seenNumbers[len(seenNumbers)-1]
 			for i := 0; i < len(seenNumbers)-2; i++ {
@@ -34,7 +34,6 @@ func (dsPtr *Set) Find(x int) int {
 		}
 		seenNumbers = append(seenNumbers, currentPlace)
 	}
-	return -1
 }
 
 //Union unions the sets containing x and y in ds.

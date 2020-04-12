@@ -99,7 +99,6 @@ func equitableRefinementProcedure(g Graph, op OrderedPartition, edgeColours func
 			//fmt.Printf("(%v, %v)", i, j)
 			//fmt.Println(tmp)
 			if !isConstant(tmp) {
-
 				newBinSizes := nbs[:0]
 				currentBinSize := 1
 				sort.Sort(tmp)
@@ -160,7 +159,7 @@ func (a edgeList) Less(i, j int) bool { return a[i].position < a[j].position }
 func compare(a, b edgeList) int {
 	aIndex := 0
 	bIndex := 0
-	for true {
+	for {
 		if aIndex >= len(a) && bIndex >= len(b) {
 			return 0
 		}
@@ -222,7 +221,6 @@ func compare(a, b edgeList) int {
 		aIndex++
 		bIndex++
 	}
-	return 0
 }
 
 func permuteEdgesList(e edgeList, perm []int, backingEdgeList edgeList, space []int) edgeList {
@@ -244,7 +242,6 @@ func permuteEdgesList(e edgeList, perm []int, backingEdgeList edgeList, space []
 					backingEdgeList = append(backingEdgeList, edge{from: i, to: j, position: (j*(j-1))/2 + i, weight: e[index].weight})
 				}
 			}
-
 		}
 		return backingEdgeList
 	}
@@ -385,7 +382,6 @@ func CanonicalIsomorphCustom(g Graph, edgeColours func(i, j int) int, maxEdgeCol
 	space := make([]int, n)
 loop:
 	for len(toCheck) > 0 {
-
 		op, toCheck = toCheck[len(toCheck)-1], toCheck[:len(toCheck)-1]
 		if len(op.Path) > 1 && ints.HasPrefix(firstLeafPath, op.Path[:len(op.Path)-1]) {
 			y := firstLeafOrbits.Find(op.Order[op.SplitPoint])
@@ -397,7 +393,6 @@ loop:
 				index--
 			}
 		} else if len(op.Path) > 1 && ints.HasPrefix(currentBestPath, op.Path[:len(op.Path)-1]) {
-
 			y := currentBestOrbits.Find(op.Order[op.SplitPoint])
 			index := op.SplitPoint + op.BinSizes[op.SplitPoint+1]
 			for i := 0; i < op.BinSizes[op.SplitPoint+1]-op.Path[len(op.Path)-1]; i++ {
@@ -462,7 +457,6 @@ loop:
 					}
 					generators = append(generators, tmp)
 				}
-
 			}
 			if comp := compare(s, firstLeaf); comp == 0 {
 				//Heuristic 1

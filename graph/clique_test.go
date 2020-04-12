@@ -45,7 +45,6 @@ func TestCliqueNumber(t *testing.T) {
 		t.Logf("Complete Graph Expected: 2 Found: %v\n", c)
 		t.Fail()
 	}
-
 }
 
 func TestIndependenceNumber(t *testing.T) {
@@ -67,5 +66,4 @@ func TestIndependenceNumber(t *testing.T) {
 			t.Fail()
 		}
 	}
-
 }

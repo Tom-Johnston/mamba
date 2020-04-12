@@ -174,7 +174,7 @@ func HypercubeGraph(dim int) *DenseGraph {
 	for i := 0; i < 1<<uint(dim); i++ {
 		var j uint
 		for j = 0; j < uint(dim); j++ {
-			g.AddEdge(i, i^(1<<uint(j)))
+			g.AddEdge(i, i^(1<<j))
 		}
 	}
 	return g

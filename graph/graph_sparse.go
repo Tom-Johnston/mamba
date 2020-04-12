@@ -45,7 +45,6 @@ func NewSparse(n int, neighbourhoods []sortints.SortedInts) *SparseGraph {
 	}
 
 	return &SparseGraph{NumberOfVertices: n, NumberOfEdges: ints.Sum(degreeSequence) / 2, Neighbourhoods: tmpNeighbourhoods, DegreeSequence: degreeSequence}
-
 }
 
 //N returns the number of vertices in g.
@@ -92,9 +91,8 @@ func (g *SparseGraph) AddVertex(neighbours []int) {
 		g.DegreeSequence[v]++
 	}
 
-	g.Neighbourhoods = append(g.Neighbourhoods, sortints.SortedInts(tmp))
+	g.Neighbourhoods = append(g.Neighbourhoods, tmp)
 	g.DegreeSequence = append(g.DegreeSequence, len(neighbours))
-
 }
 
 //RemoveVertex removes the specified vertex. The index of a vertex u > v becomes u - 1 while the index of u < v is unchanged.
@@ -114,7 +112,6 @@ func (g *SparseGraph) RemoveVertex(i int) {
 			g.Neighbourhoods[j][k]--
 		}
 	}
-
 }
 
 //AddEdge modifies the graph by adding the edge (i, j) if it is not already present.

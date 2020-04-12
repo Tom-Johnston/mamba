@@ -54,7 +54,7 @@ func GreedyColor(g Graph, order []int) (int, []int) {
 		}
 		i := 0
 		for i = 0; i < n; i++ {
-			if seenColours[i] == false {
+			if !seenColours[i] {
 				c[v] = i
 				if i > maxColour {
 					maxColour = i

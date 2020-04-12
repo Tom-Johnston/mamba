@@ -29,7 +29,6 @@ func TestBuilder(t *testing.T) {
 	if dawg.numberOfNodes() != 19 {
 		t.Fail()
 	}
-
 }
 
 func TestNew(t *testing.T) {
@@ -61,7 +60,6 @@ func TestLookup(t *testing.T) {
 	testFails := [][]byte{[]byte("ab"), []byte(""), []byte("hello")}
 	for _, test := range testFails {
 		if _, ok := dawg.Lookup(test); ok == true {
-
 			t.Fail()
 		}
 	}
@@ -186,6 +184,9 @@ func TestGob(t *testing.T) {
 	}
 
 	dawg, err = crossWord()
+	if err != nil {
+		t.Fatal(err)
+	}
 	b, err = dawg.GobEncode()
 	if err != nil {
 		t.Fatal(err)
@@ -200,7 +201,6 @@ func TestGob(t *testing.T) {
 	if ts.numberOfNodes() != dawg.numberOfNodes() {
 		t.Fail()
 	}
-
 }
 
 func BenchmarkNew(b *testing.B) {
@@ -227,7 +227,10 @@ func BenchmarkNew(b *testing.B) {
 	sort.Slice(words, less)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		New(words)
+		_, err := New(words)
+		if err != nil {
+			b.FailNow()
+		}
 	}
 }
 
@@ -293,7 +296,10 @@ func BenchmarkGobEncode(b *testing.B) {
 	}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		dawg.GobEncode()
+		_, err := dawg.GobEncode()
+		if err != nil {
+			b.FailNow()
+		}
 	}
 }
 

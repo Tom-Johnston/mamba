@@ -97,7 +97,6 @@ func AllMaximalCliques(g Graph, c chan []int) {
 		}
 	}
 	close(c)
-	return
 }
 
 //CliqueNumber returns the size of the largest clique in g.

@@ -24,7 +24,7 @@ import (
 // 10   0   0   0   0    0    0     0      0        0        1
 // 11   0   0   0   0    0    0     0      0        0        0
 func TestChromaticNumber(t *testing.T) {
-	//truthData[n][k] contais the number of graphs of size n + 1 with chromatic numer k
+	//truthData[n][k] contains the number of graphs of size n + 1 with chromatic numer k
 	truthData := make([][]int, 10)
 	truthData[0] = []int{0, 1}
 	truthData[1] = []int{0, 1, 1}

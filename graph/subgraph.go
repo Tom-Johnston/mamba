@@ -32,7 +32,7 @@ func NumberOfCycles(g EditableGraph) []int {
 		//The fundamental cycles. They will be stored as a list of edges where the edge (i,j) with i < j is encoded as (j*(j-1))/2 + i.
 		fundCycles := make([][]int, 0, 1)
 
-		T := make([]int, n, n) //T[u] will store the parent vertex of each vertex in the tree (except the root 0). If the vertex v is not in the tree T[v] = -1.
+		T := make([]int, n) //T[u] will store the parent vertex of each vertex in the tree (except the root 0). If the vertex v is not in the tree T[v] = -1.
 		for i := 1; i < n; i++ {
 			T[i] = -1
 		}
@@ -76,9 +76,7 @@ func NumberOfCycles(g EditableGraph) []int {
 					depth[u] = depth[v] + 1
 				}
 				h.RemoveEdge(u, v)
-
 			}
-
 		}
 		if len(fundCycles) == 0 {
 			//No need to do anything.

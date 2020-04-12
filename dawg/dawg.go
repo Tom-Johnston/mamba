@@ -95,12 +95,12 @@ func (t *Dawg) numberOfNodes() int {
 func (t *Dawg) listNodesCountEdges() (nodes []uint64, numEdges int) {
 	nodes = append(nodes, t.id)
 	numEdges = len(t.links)
-	currDecisions := make([]int, 1, 1)
+	currDecisions := make([]int, 1)
 	currDecisions[0] = -1
-	currDawgs := make([]*Dawg, 1, 1)
+	currDawgs := make([]*Dawg, 1)
 	currDawgs[0] = t
 toCheckLoop:
-	for true {
+	for {
 		currDawg := currDawgs[len(currDawgs)-1]
 		for j := currDecisions[len(currDecisions)-1] + 1; j < len(currDawg.linkLabels); j++ {
 			currDawgs = append(currDawgs, currDawg.links[j])
@@ -125,8 +125,6 @@ toCheckLoop:
 			return
 		}
 	}
-	//We can never return here.
-	return nil, -1
 }
 
 type letterCount struct {
@@ -246,7 +244,6 @@ func (t *Dawg) addSuffix(suffix []byte, lastID uint64) uint64 {
 
 //GobEncode encodes the dawg as a []byte suitable for sending or storage. It preserves the id of the nodes in case they are relevant for other data.
 func (t *Dawg) GobEncode() ([]byte, error) {
-
 	sortedNodes, numEdges := t.listNodesCountEdges()
 	numNodes := len(sortedNodes)
 
@@ -269,9 +266,9 @@ func (t *Dawg) GobEncode() ([]byte, error) {
 		b = append(b, buf...)
 	}
 
-	currDecisions := make([]int, 1, 1)
+	currDecisions := make([]int, 1)
 	currDecisions[0] = -1
-	currDawgs := make([]*Dawg, 1, 1)
+	currDawgs := make([]*Dawg, 1)
 	currDawgs[0] = t
 
 	buf = encodeUint64(convertID(t.id), buf)
@@ -294,7 +291,7 @@ func (t *Dawg) GobEncode() ([]byte, error) {
 	}
 
 toCheckLoop:
-	for true {
+	for {
 		currDawg := currDawgs[len(currDawgs)-1]
 
 		for j := currDecisions[len(currDecisions)-1] + 1; j < len(currDawg.linkLabels); j++ {
@@ -340,8 +337,6 @@ toCheckLoop:
 			return b, nil
 		}
 	}
-	//We can never return here.
-	return nil, nil
 }
 
 //GobDecode decodes the dawg given in b into t, replacing the current contents of t.
@@ -392,6 +387,9 @@ func (t *Dawg) GobDecode(b []byte) error {
 		}
 
 		numChild, _, err := decodeUint64(r, buf)
+		if err != nil {
+			return err
+		}
 		ts[indexID].linkLabels = make([]byte, 0, numChild)
 		ts[indexID].links = make([]*Dawg, 0, numChild)
 		var j uint64
@@ -401,6 +399,9 @@ func (t *Dawg) GobDecode(b []byte) error {
 				return err
 			}
 			target, _, err := decodeUint64(r, buf)
+			if err != nil {
+				return err
+			}
 			ts[indexID].linkLabels = append(ts[indexID].linkLabels, label)
 			ts[indexID].links = append(ts[indexID].links, ts[target])
 		}

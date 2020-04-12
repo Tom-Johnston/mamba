@@ -1,27 +1,5 @@
 package itertools
 
-func totalLength(a [][]int) int {
-	n := 0
-	for _, s := range a {
-		n += len(s)
-	}
-	return n
-}
-
-//The restricted growth string of a partition is the sequence of numbers r[0], ..., r[n-1] where  r[i] is the index of the set that i is in when the sets are ordered in increasing size of their smallest element.
-//sets must be ordered in increasing size of their smallest element.
-func restrictedGrowthString(sets [][]int) []int {
-	rgs := make([]int, totalLength(sets))
-	curr := 0
-	for _, set := range sets {
-		for _, j := range set {
-			rgs[j] = curr
-		}
-		curr++
-	}
-	return rgs
-}
-
 func partitionFromRestrictedGrowthString(rgs []int) [][]int {
 	n := len(rgs)
 	max := 0

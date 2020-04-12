@@ -23,7 +23,11 @@ func TestLIB(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	LIB(buf, n, weights)
+	err = LIB(buf, n, weights)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
 	if !bytes.Equal(buf.Bytes(), truthData) {
 		t.Log(buf.Bytes())
 		t.Log(truthData)
