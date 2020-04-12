@@ -1,4 +1,4 @@
-package comb
+package itertools
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/Tom-Johnston/gigraph/ints"
 )
 
-func TestPartitionIterator(t *testing.T) {
+func TestPartitions(t *testing.T) {
 	//Truth data
 	correctOutput := [][][]int{
 		[][]int{[]int{0, 1, 2, 3}},
@@ -26,7 +26,7 @@ func TestPartitionIterator(t *testing.T) {
 		[][]int{[]int{0}, []int{1}, []int{2}, []int{3}},
 	}
 
-	pi := NewPartitionIterator(4)
+	pi := Partitions(4)
 	index := 0
 	for pi.Next() {
 		if index >= len(correctOutput) {

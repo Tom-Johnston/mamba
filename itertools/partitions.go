@@ -1,4 +1,4 @@
-package comb
+package itertools
 
 func totalLength(a [][]int) int {
 	n := 0
@@ -55,7 +55,7 @@ type PartitionIterator struct {
 //TODO Handle n = 0
 //NewPartitionIterator returns a *PartitionIterator which iterates over all partitions of the set {0, ..., n-1}.
 //The partitions are generated in lexicographic order of their restricted growth sequences.
-func NewPartitionIterator(n int) *PartitionIterator {
+func Partitions(n int) *PartitionIterator {
 	if n < 1 {
 		panic("Cannot handle n < 1")
 	}
