@@ -1,6 +1,6 @@
 package graph
 
-import "github.com/Tom-Johnston/gigraph/sortints"
+import "github.com/Tom-Johnston/mamba/sortints"
 
 //SplitEdge modifies the graph G by removing the edge ij (if it is present) and adding a new vertex connected to i and j.
 func SplitEdge(g EditableGraph, i, j int) {

@@ -3,7 +3,7 @@ package graph_test
 import (
 	"testing"
 
-	"github.com/Tom-Johnston/gigraph/graph"
+	"github.com/Tom-Johnston/mamba/graph"
 )
 
 func TestInducedSubgraph(t *testing.T) {

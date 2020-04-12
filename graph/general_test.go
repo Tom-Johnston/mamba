@@ -3,11 +3,11 @@ package graph_test
 import (
 	"testing"
 
-	"github.com/Tom-Johnston/gigraph/graph/search"
-	"github.com/Tom-Johnston/gigraph/ints"
-	"github.com/Tom-Johnston/gigraph/sortints"
+	"github.com/Tom-Johnston/mamba/graph/search"
+	"github.com/Tom-Johnston/mamba/ints"
+	"github.com/Tom-Johnston/mamba/sortints"
 
-	"github.com/Tom-Johnston/gigraph/graph"
+	"github.com/Tom-Johnston/mamba/graph"
 )
 
 func TestDegeneracy(t *testing.T) {

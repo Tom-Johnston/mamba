@@ -3,9 +3,9 @@ package graph_test
 import (
 	"testing"
 
-	"github.com/Tom-Johnston/gigraph/graph"
-	"github.com/Tom-Johnston/gigraph/graph/search"
-	"github.com/Tom-Johnston/gigraph/ints"
+	"github.com/Tom-Johnston/mamba/graph"
+	"github.com/Tom-Johnston/mamba/graph/search"
+	"github.com/Tom-Johnston/mamba/ints"
 )
 
 //The truth data was generated using the function but while there were other tests.

@@ -3,8 +3,8 @@ package search
 import (
 	"testing"
 
-	. "github.com/Tom-Johnston/gigraph/graph"
-	"github.com/Tom-Johnston/gigraph/ints"
+	. "github.com/Tom-Johnston/mamba/graph"
+	"github.com/Tom-Johnston/mamba/ints"
 )
 
 func TestAll(t *testing.T) {

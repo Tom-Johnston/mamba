@@ -3,8 +3,8 @@ package graph
 import (
 	"sort"
 
-	"github.com/Tom-Johnston/gigraph/ints"
-	"github.com/Tom-Johnston/gigraph/sortints"
+	"github.com/Tom-Johnston/mamba/ints"
+	"github.com/Tom-Johnston/mamba/sortints"
 )
 
 //SparseGraph is a data structure for representing a simple undirected graph. *SparseGraph implements the graph insterface.

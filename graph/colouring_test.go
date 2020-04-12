@@ -3,9 +3,9 @@ package graph_test
 import (
 	"testing"
 
-	"github.com/Tom-Johnston/gigraph/graph"
-	"github.com/Tom-Johnston/gigraph/graph/search"
-	"github.com/Tom-Johnston/gigraph/ints"
+	"github.com/Tom-Johnston/mamba/graph"
+	"github.com/Tom-Johnston/mamba/graph/search"
+	"github.com/Tom-Johnston/mamba/ints"
 )
 
 //From http://keithbriggs.info/cgt.html

@@ -3,7 +3,7 @@ package graph
 import (
 	"sort"
 
-	"github.com/Tom-Johnston/gigraph/ints"
+	"github.com/Tom-Johnston/mamba/ints"
 )
 
 //ConnectedComponent returns the connected component in g containing v.

@@ -4,9 +4,9 @@ import (
 	"runtime"
 	"sort"
 
-	"github.com/Tom-Johnston/gigraph/comb"
-	"github.com/Tom-Johnston/gigraph/disjoint"
-	. "github.com/Tom-Johnston/gigraph/graph"
+	"github.com/Tom-Johnston/mamba/comb"
+	"github.com/Tom-Johnston/mamba/disjoint"
+	. "github.com/Tom-Johnston/mamba/graph"
 )
 
 //AllParallel sends all non-isomorphic graphs on n vertices to the output channel which it then closes. It automatically splits the work across GOMAXPROCS goroutines.

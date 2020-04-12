@@ -3,7 +3,7 @@ package graph
 import (
 	"container/list"
 
-	"github.com/Tom-Johnston/gigraph/ints"
+	"github.com/Tom-Johnston/mamba/ints"
 )
 
 //Distance returns the length of the shortest path from i to j in g and -1 if there is no path

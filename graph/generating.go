@@ -3,8 +3,8 @@ package graph
 import (
 	"math/rand"
 
-	"github.com/Tom-Johnston/gigraph/comb"
-	"github.com/Tom-Johnston/gigraph/sortints"
+	"github.com/Tom-Johnston/mamba/comb"
+	"github.com/Tom-Johnston/mamba/sortints"
 )
 
 //Random Graphs

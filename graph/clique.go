@@ -1,7 +1,10 @@
 package graph
 
-import "math/rand"
-import "github.com/Tom-Johnston/gigraph/sortints"
+import (
+	"math/rand"
+
+	"github.com/Tom-Johnston/mamba/sortints"
+)
 
 //cliqueData is a wrapper used in the CliqueNumber.
 type cliqueData struct {

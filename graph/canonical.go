@@ -3,8 +3,8 @@ package graph
 import (
 	"sort"
 
-	"github.com/Tom-Johnston/gigraph/disjoint"
-	"github.com/Tom-Johnston/gigraph/ints"
+	"github.com/Tom-Johnston/mamba/disjoint"
+	"github.com/Tom-Johnston/mamba/ints"
 )
 
 //OrderedPartition is a wrapper containing the information of an ordered partition and the path that the CanonicalIsomorph function used to reach the partition.

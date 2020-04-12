@@ -3,8 +3,8 @@ package graph
 import (
 	"sort"
 
-	"github.com/Tom-Johnston/gigraph/ints"
-	"github.com/Tom-Johnston/gigraph/sortints"
+	"github.com/Tom-Johnston/mamba/ints"
+	"github.com/Tom-Johnston/mamba/sortints"
 )
 
 //NumberOfCycles returns a slice where the ith element contains the number of cycles of length i.

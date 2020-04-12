@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Tom-Johnston/gigraph/graph"
+	"github.com/Tom-Johnston/mamba/graph"
 )
 
 func TestCanonicalIsomorph(t *testing.T) {

@@ -3,8 +3,8 @@ package graph
 import (
 	"sort"
 
-	"github.com/Tom-Johnston/gigraph/ints"
-	"github.com/Tom-Johnston/gigraph/sortints"
+	"github.com/Tom-Johnston/mamba/ints"
+	"github.com/Tom-Johnston/mamba/sortints"
 )
 
 //IsPlanar returns true if the graph is a planar graph and false otherwise. The current implementation is simple but runs in O(n^2) while linear time algorithms are known.

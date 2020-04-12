@@ -3,7 +3,7 @@ package itertools
 import (
 	"testing"
 
-	"github.com/Tom-Johnston/gigraph/ints"
+	"github.com/Tom-Johnston/mamba/ints"
 )
 
 func TestPartitions(t *testing.T) {
