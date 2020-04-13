@@ -41,7 +41,7 @@ func ConnectedComponents(g Graph) [][]int {
 	if g.N() == 0 {
 		return [][]int{}
 	} else if g.N() == 1 {
-		return [][]int{[]int{0}}
+		return [][]int{{0}}
 	}
 	components := make([][]int, 0, 1)
 

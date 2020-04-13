@@ -7,7 +7,7 @@ import (
 func TestCombinations(t *testing.T) {
 	//Truth data
 	correctOutput := [][]int{
-		[]int{},
+		{},
 	}
 
 	iter := Combinations(4, 0)

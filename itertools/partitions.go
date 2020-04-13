@@ -30,9 +30,9 @@ type PartitionIterator struct {
 	b []int
 }
 
-//TODO Handle n = 0
-//NewPartitionIterator returns a *PartitionIterator which iterates over all partitions of the set {0, ..., n-1}.
+//Partitions returns a *PartitionIterator which iterates over all partitions of the set {0, ..., n-1}.
 //The partitions are generated in lexicographic order of their restricted growth sequences.
+//TODO Handle n = 0
 func Partitions(n int) *PartitionIterator {
 	if n < 1 {
 		panic("Cannot handle n < 1")

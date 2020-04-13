@@ -326,7 +326,7 @@ func CanonicalIsomorphCustom(g Graph, edgeColours func(i, j int) int, maxEdgeCol
 		ds := make([]int, n)
 		ds[0] = -2
 		if n == 1 {
-			return perm, disjoint.Set(ds), [][]int{[]int{0}}
+			return perm, disjoint.Set(ds), [][]int{{0}}
 		}
 		generators := make([][]int, 2)
 		tmp := make([]int, n)

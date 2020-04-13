@@ -29,9 +29,9 @@ func TestGraph6(t *testing.T) {
 
 func TestSparse6Encode(t *testing.T) {
 	testGraphs := [][]string{
-		[]string{"Ks@HOo?PGdCK", ":K`ADOccQXK`IaXcQMb"},
-		[]string{"OsaBA`GP@`dIHWEcas_]O", ":O`ACGPDC[QPJGYCqG\\KafPK`ckeSqDsIWyn"},
-		[]string{"J?AKagjXfo?", ":Ji?c@pEUPBFaGhg@CKf"},
+		{"Ks@HOo?PGdCK", ":K`ADOccQXK`IaXcQMb"},
+		{"OsaBA`GP@`dIHWEcas_]O", ":O`ACGPDC[QPJGYCqG\\KafPK`ckeSqDsIWyn"},
+		{"J?AKagjXfo?", ":Ji?c@pEUPBFaGhg@CKf"},
 	}
 	for _, s := range testGraphs {
 		g, err := graph.Graph6Decode(s[0])
@@ -48,9 +48,9 @@ func TestSparse6Encode(t *testing.T) {
 
 func TestSparse6Decode(t *testing.T) {
 	testGraphs := [][]string{
-		[]string{"Ks@HOo?PGdCK", ":K`ADOccQXK`IaXcQMb"},
-		[]string{"OsaBA`GP@`dIHWEcas_]O", ":O`ACGPDC[QPJGYCqG\\KafPK`ckeSqDsIWyn"},
-		[]string{"J?AKagjXfo?", ":Ji?c@pEUPBFaGhg@CKf"},
+		{"Ks@HOo?PGdCK", ":K`ADOccQXK`IaXcQMb"},
+		{"OsaBA`GP@`dIHWEcas_]O", ":O`ACGPDC[QPJGYCqG\\KafPK`ckeSqDsIWyn"},
+		{"J?AKagjXfo?", ":Ji?c@pEUPBFaGhg@CKf"},
 	}
 	for _, s := range testGraphs {
 		g, err := graph.Sparse6Decode(s[1])
