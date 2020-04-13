@@ -3,7 +3,7 @@ package search
 import (
 	"testing"
 
-	. "github.com/Tom-Johnston/mamba/graph"
+	"github.com/Tom-Johnston/mamba/graph"
 	"github.com/Tom-Johnston/mamba/ints"
 )
 
@@ -12,7 +12,7 @@ func TestAll(t *testing.T) {
 	maxSize := 9 //Largest graphs we will search for.
 	numberFound := make([]int, maxSize+1)
 	for size := 0; size <= maxSize; size++ {
-		output := make(chan *DenseGraph, 1)
+		output := make(chan *graph.DenseGraph, 1)
 		go All(size, output, 0, 1)
 
 		for range output {
@@ -30,7 +30,7 @@ func TestAllParallel(t *testing.T) {
 	maxSize := 9 //Largest graphs we will search for.
 	numberFound := make([]int, maxSize+1)
 	for size := 0; size <= maxSize; size++ {
-		output := make(chan *DenseGraph, 1)
+		output := make(chan *graph.DenseGraph, 1)
 		go AllParallel(size, output)
 
 		for range output {

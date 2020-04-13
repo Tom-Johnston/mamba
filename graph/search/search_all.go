@@ -6,16 +6,16 @@ import (
 
 	"github.com/Tom-Johnston/mamba/comb"
 	"github.com/Tom-Johnston/mamba/disjoint"
-	. "github.com/Tom-Johnston/mamba/graph"
+	"github.com/Tom-Johnston/mamba/graph"
 )
 
 //AllParallel sends all non-isomorphic graphs on n vertices to the output channel which it then closes. It automatically splits the work across GOMAXPROCS goroutines.
-func AllParallel(n int, output chan *DenseGraph) {
+func AllParallel(n int, output chan *graph.DenseGraph) {
 	m := runtime.GOMAXPROCS(0)
 	counter := m
 	count := make(chan bool)
 	for i := 0; i < m; i++ {
-		c := make(chan *DenseGraph)
+		c := make(chan *graph.DenseGraph)
 		tmp := i
 		go func() {
 			go All(n, c, tmp, m)
@@ -35,11 +35,11 @@ func AllParallel(n int, output chan *DenseGraph) {
 }
 
 //All with a= 0 and m = 1 sends all non-isomorphic graphs on n vertices to the output channel which it then closes. In general, this will begin a search using canonical deletion to find all graphs on at most n vertices where the choice at level ceil(2n/3) is equal to a mod m. For small values of m this should produce a fairly even split and allow for some small parallelism.
-func All(n int, output chan *DenseGraph, a int, m int) {
-	var object *DenseGraph
+func All(n int, output chan *graph.DenseGraph, a int, m int) {
+	var object *graph.DenseGraph
 	augs := make([][]int, 1)
-	objs := make([]*DenseGraph, 1)
-	objectsToCheck := []*DenseGraph{NewDense(0, nil)}
+	objs := make([]*graph.DenseGraph, 1)
+	objectsToCheck := []*graph.DenseGraph{graph.NewDense(0, nil)}
 	splitLevel := 2 * (n + 1) / 3
 	if n == 0 {
 		if a == 0 {
@@ -72,9 +72,9 @@ func All(n int, output chan *DenseGraph, a int, m int) {
 	close(output)
 }
 
-func getAugmentations(g *DenseGraph, augs [][]int) [][]int {
+func getAugmentations(g *graph.DenseGraph, augs [][]int) [][]int {
 	n := g.NumberOfVertices
-	minDegree := MinDegree(g)
+	minDegree := graph.MinDegree(g)
 	maxSize := minDegree + 1
 	augs = augs[:0]
 
@@ -85,7 +85,7 @@ func getAugmentations(g *DenseGraph, augs [][]int) [][]int {
 	f := func(i, j int) int {
 		return 1
 	}
-	_, _, generators := CanonicalIsomorphCustom(g, f, 1, OrderedPartition{Order: order, BinSizes: []int{n}, Path: []int{}, SplitPoint: 0})
+	_, _, generators := graph.CanonicalIsomorphCustom(g, f, 1, graph.OrderedPartition{Order: order, BinSizes: []int{n}, Path: []int{}, SplitPoint: 0})
 	for k := 0; k <= maxSize; k++ {
 		ds := disjoint.New(comb.Coeff(n, k))
 		for i := 0; i < len(ds); i++ {
@@ -108,7 +108,7 @@ func getAugmentations(g *DenseGraph, augs [][]int) [][]int {
 	return augs
 }
 
-func applyAugmentation(g *DenseGraph, aug []int) *DenseGraph {
+func applyAugmentation(g *graph.DenseGraph, aug []int) *graph.DenseGraph {
 	newGraph := g.Copy()
 	newGraph.AddVertex(aug)
 	n := g.N() + 1
@@ -118,10 +118,10 @@ func applyAugmentation(g *DenseGraph, aug []int) *DenseGraph {
 	for _, v := range aug {
 		edges[p+v] = 1
 	}
-	return newGraph.(*DenseGraph)
+	return newGraph.(*graph.DenseGraph)
 }
 
-func isCanonical(g *DenseGraph, aug []int, h *DenseGraph) bool {
+func isCanonical(g *graph.DenseGraph, aug []int, h *graph.DenseGraph) bool {
 	n := g.NumberOfVertices
 
 	viable := make([]int, 0, n+1)
@@ -183,7 +183,7 @@ func isCanonical(g *DenseGraph, aug []int, h *DenseGraph) bool {
 	f := func(i, j int) int {
 		return 1
 	}
-	perm, orbits, _ := CanonicalIsomorphCustom(h, f, 1, OrderedPartition{Order: order, BinSizes: []int{h.NumberOfVertices}, Path: []int{}, SplitPoint: 0})
+	perm, orbits, _ := graph.CanonicalIsomorphCustom(h, f, 1, graph.OrderedPartition{Order: order, BinSizes: []int{h.NumberOfVertices}, Path: []int{}, SplitPoint: 0})
 	for _, u := range perm {
 		for _, v := range viable {
 			if u == v {
