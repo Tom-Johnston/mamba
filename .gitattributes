@@ -1,0 +1,2 @@
+# We expect the golden output to be LF formatted.
+*.golden text eol=lf
