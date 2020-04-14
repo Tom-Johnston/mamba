@@ -15,6 +15,10 @@ const maxInt = int(maxUint >> 1)
 //For the definition of the format see: https://users.cecs.anu.edu.au/~bdm/data/formats.txt
 //The empty string decodes as the empty graph.
 func Graph6Decode(s string) (*DenseGraph, error) {
+	if strings.HasPrefix(s, ">>graph6<<") {
+		s = s[10:]
+	}
+
 	//Check the bytes are in 63-126 (inclusive). This could be done during decoding but it is neater to check here.
 	for i := 0; i < len(s); i++ {
 		if s[i] < 63 || s[i] > 126 {
@@ -118,6 +122,11 @@ func Graph6Encode(g Graph) string {
 //Sparse6Decode decode returns the graph with Sparse6 encoding s or an error if no such graph exists.
 //For the definition of the format see: https://users.cecs.anu.edu.au/~bdm/data/formats.txt
 func Sparse6Decode(s string) (*SparseGraph, error) {
+	//Strip the header if present
+	if strings.HasPrefix(s, ">>sparse6<<") {
+		s = s[11:]
+	}
+
 	//Check the initial byte and remove it.
 	if s[0] != 58 {
 		return &SparseGraph{}, fmt.Errorf("Incorrect first character. Expected: : Found: %v", s[0])

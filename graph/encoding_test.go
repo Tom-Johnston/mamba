@@ -9,6 +9,34 @@ import (
 )
 
 func TestGraph6(t *testing.T) {
+	g := graph.NewDense(5, nil)
+	g.AddEdge(0, 2)
+	g.AddEdge(0, 4)
+	g.AddEdge(1, 3)
+	g.AddEdge(3, 4)
+	g6 := "DQc"
+	g6Header := ">>graph6<<" + g6
+
+	foundG, err := graph.Graph6Decode(g6)
+	if err != nil {
+		t.Error(err)
+	}
+	if !graph.Equal(g, foundG) {
+		t.Fail()
+	}
+	foundGHeader, err := graph.Graph6Decode(g6Header)
+	if err != nil {
+		t.Error(err)
+	}
+	if !graph.Equal(g, foundGHeader) {
+		t.Fail()
+	}
+
+	foundEncode := graph.Graph6Encode(g)
+	if foundEncode != g6 {
+		t.Fail()
+	}
+
 	for i := 1; i <= 8; i++ {
 		output := make(chan *graph.DenseGraph)
 		go search.All(i, output, 0, 1)
@@ -49,6 +77,7 @@ func TestSparse6Encode(t *testing.T) {
 func TestSparse6Decode(t *testing.T) {
 	testGraphs := [][]string{
 		{"Ks@HOo?PGdCK", ":K`ADOccQXK`IaXcQMb"},
+		{"Ks@HOo?PGdCK", ">>sparse6<<:K`ADOccQXK`IaXcQMb"},
 		{"OsaBA`GP@`dIHWEcas_]O", ":O`ACGPDC[QPJGYCqG\\KafPK`ckeSqDsIWyn"},
 		{"J?AKagjXfo?", ":Ji?c@pEUPBFaGhg@CKf"},
 	}
