@@ -41,7 +41,10 @@ func TestChromaticNumber(t *testing.T) {
 		foundData := make([]int, i+1)
 		go search.All(i, output, 0, 1)
 		for g := range output {
-			chromaticNumber, _ := graph.ChromaticNumber(g)
+			chromaticNumber, colouring := graph.ChromaticNumber(g)
+			if !graph.IsProperColouring(g, colouring) {
+				t.Fatal(g, colouring)
+			}
 			foundData[chromaticNumber]++
 		}
 		if !ints.Equal(foundData, truthData[i-1]) {
@@ -55,8 +58,17 @@ func TestChromaticNumber(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	cn, _ := graph.ChromaticNumber(g)
-	if cn != 3 {
+	cn, colouring := graph.ChromaticNumber(g)
+	if !graph.IsProperColouring(g, colouring) || cn != 3 {
+		t.Fail()
+	}
+
+	g, err = graph.Graph6Decode("KCOedae]SrLu")
+	if err != nil {
+		t.Error(err)
+	}
+	cn, colouring = graph.ChromaticNumber(g)
+	if !graph.IsProperColouring(g, colouring) || cn != 4 {
 		t.Fail()
 	}
 }
