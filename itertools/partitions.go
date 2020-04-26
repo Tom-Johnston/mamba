@@ -71,7 +71,71 @@ func (pi *PartitionIterator) Next() bool {
 }
 
 //Value returns the current partition.
-//It is safe to modify the output.
+//It is safe to modify the output, although one shouldn't depend on this.
 func (pi PartitionIterator) Value() [][]int {
 	return partitionFromRestrictedGrowthString(pi.a)
+}
+
+//IntegerPartitionIterator iterates over all ways of writing n as the sum of positive integers in descending order.
+//The integer partitons are generated in reverse lexicographic order.
+type IntegerPartitionIterator struct {
+	a []int
+	m int
+	q int //The last partition element that is greater than 1.
+}
+
+//IntegerPartitions returns an *IntegerPartitionIterator for iterating over all ways of writing n as the sum of positive integers in descending order.
+//The integer partitons are generated in reverse lexicographic order.
+func IntegerPartitions(n int) *IntegerPartitionIterator {
+	if n == 0 {
+		return &IntegerPartitionIterator{a: nil, m: 0, q: -1}
+	}
+	a := make([]int, n)
+	for i := 1; i < n; i++ {
+		a[i] = 1
+	}
+	a[0] = n
+	return &IntegerPartitionIterator{a: a, m: 1, q: -2}
+}
+
+//Next tries to advance iter to the next integer partition, returning true if there is one and false if there isn't.
+func (iter *IntegerPartitionIterator) Next() bool {
+	if iter.q == -2 {
+		if iter.a[0] == 1 {
+			iter.q = -1
+		} else {
+			iter.q = 0
+		}
+		return true
+	}
+	if iter.q == -1 {
+		return false
+	}
+	if iter.a[iter.q] == 2 {
+		iter.a[iter.q] = 1
+		iter.q--
+		iter.m++
+		return true
+	}
+	iter.a[iter.q]--
+	x := iter.a[iter.q]
+	tailSum := iter.m - iter.q
+	for tailSum > x {
+		iter.q++
+		tailSum -= x
+		iter.a[iter.q] = x
+	}
+	iter.m = iter.q + 1
+	iter.a[iter.m] = tailSum
+	iter.m++
+	if tailSum > 1 {
+		iter.q++
+	}
+	return true
+}
+
+//Value returns the current integer partition.
+//It is not safe to modify the output
+func (iter IntegerPartitionIterator) Value() []int {
+	return iter.a[:iter.m]
 }
