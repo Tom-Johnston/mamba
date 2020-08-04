@@ -53,7 +53,7 @@ func (g DenseGraph) M() int {
 
 //IsEdge returns true if the undirected edge (i, j) is present in the graph and false otherwise.
 func (g DenseGraph) IsEdge(i, j int) bool {
-	if i >= g.N() || j >= g.N() || i < 0 || j < 0 {
+	if i >= g.NumberOfVertices || j >= g.NumberOfVertices || i < 0 || j < 0 {
 		return false
 	}
 	if i < j && g.Edges[(j*(j-1))/2+i] > 0 {
@@ -66,7 +66,7 @@ func (g DenseGraph) IsEdge(i, j int) bool {
 
 //Neighbours returns the neighbours of v i.e. the vertices u such that (u,v) is an edge.
 func (g DenseGraph) Neighbours(v int) []int {
-	degrees := g.Degrees()
+	degrees := g.DegreeSequence
 	r := make([]int, 0, degrees[v])
 	tmp := (v * (v - 1)) / 2
 	for i := 0; i < v; i++ {
@@ -127,12 +127,22 @@ func (g *DenseGraph) RemoveEdge(i, j int) {
 
 //AddVertex modifies the graph by appending one new vertex with edges from the new vertex to the vertices in neighbours.
 func (g *DenseGraph) AddVertex(neighbours []int) {
-	tmp := make([]byte, g.NumberOfVertices)
+	oldSize := (g.NumberOfVertices * (g.NumberOfVertices - 1)) / 2
+	newSize := oldSize + g.NumberOfVertices
+	if cap(g.Edges) >= newSize {
+		g.Edges = g.Edges[:newSize]
+		for i := oldSize; i < newSize; i++ {
+			g.Edges[i] = 0
+		}
+	} else {
+		tmp := make([]byte, newSize)
+		copy(tmp, g.Edges)
+		g.Edges = tmp
+	}
 	for _, v := range neighbours {
-		tmp[v] = 1
+		g.Edges[oldSize+v] = 1
 		g.DegreeSequence[v]++
 	}
-	g.Edges = append(g.Edges, tmp...)
 	g.DegreeSequence = append(g.DegreeSequence, len(neighbours))
 	g.NumberOfVertices++
 	g.NumberOfEdges += len(neighbours)
@@ -146,9 +156,19 @@ func (g *DenseGraph) RemoveVertex(v int) {
 
 	//Update the degree sequences and number of edges.
 	g.NumberOfEdges -= g.DegreeSequence[v]
-	neighbours := g.Neighbours(v)
-	for _, u := range neighbours {
-		g.DegreeSequence[u]--
+	tmp := (v * (v - 1)) / 2
+	for i := 0; i < v; i++ {
+		index := tmp + i
+		if g.Edges[index] > 0 {
+			g.DegreeSequence[i]--
+		}
+	}
+
+	for i := v + 1; i < g.N(); i++ {
+		index := (i*(i-1))/2 + v
+		if g.Edges[index] > 0 {
+			g.DegreeSequence[i]--
+		}
 	}
 	copy(g.DegreeSequence[v:], g.DegreeSequence[v+1:])
 	g.DegreeSequence = g.DegreeSequence[:len(g.DegreeSequence)-1]
