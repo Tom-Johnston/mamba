@@ -1,6 +1,7 @@
 package search
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/Tom-Johnston/mamba/graph"
@@ -31,7 +32,7 @@ func TestAllParallel(t *testing.T) {
 	numberFound := make([]int, maxSize+1)
 	for size := 0; size <= maxSize; size++ {
 		output := make(chan *graph.DenseGraph, 1)
-		go AllParallel(size, output)
+		go AllParallel(size, output, runtime.GOMAXPROCS(0))
 
 		for range output {
 			numberFound[size]++
@@ -40,5 +41,14 @@ func TestAllParallel(t *testing.T) {
 	t.Log(numberFound)
 	if !ints.Equal(numberFound, truthData[:maxSize+1]) {
 		t.Fail()
+	}
+}
+
+func BenchmarkAll(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		output := make(chan *graph.DenseGraph, 1)
+		go All(10, output, 0, 1)
+		for range output {
+		}
 	}
 }
