@@ -36,12 +36,52 @@ func (dsPtr *Set) Find(x int) int {
 	}
 }
 
+//FindBuffered returns the current representation which contains x but uses buf to store the seen numbers for flattening.
+func (dsPtr *Set) FindBuffered(x int, buf []int) int {
+	ds := *dsPtr
+	if ds[x] < 0 {
+		return x
+	}
+	currentPlace := x
+	seenNumbers := buf[:1]
+	seenNumbers[0] = x
+	for {
+		if currentPlace = ds[currentPlace]; currentPlace < 0 {
+			tmp := seenNumbers[len(seenNumbers)-1]
+			for i := 0; i < len(seenNumbers)-2; i++ {
+				ds[seenNumbers[i]] = tmp
+			}
+			return tmp
+		}
+		seenNumbers = append(seenNumbers, currentPlace)
+	}
+}
+
 //Union unions the sets containing x and y in ds.
 //This implements union by rank.
 func (dsPtr *Set) Union(x, y int) {
 	ds := *dsPtr
 	parentX := ds.Find(x)
 	parentY := ds.Find(y)
+	if parentX == parentY {
+		return
+	}
+	if ds[parentX] < ds[parentY] {
+		ds[parentY] = parentX
+	} else if ds[parentY] < ds[parentX] {
+		ds[parentX] = parentY
+	} else {
+		ds[parentX] = parentY
+		ds[parentY]--
+	}
+}
+
+//UnionBuffered unions the sets containing x and y in ds using the buffer provided.
+//This implements union by rank.
+func (dsPtr *Set) UnionBuffered(x, y int, buf []int) {
+	ds := *dsPtr
+	parentX := ds.FindBuffered(x, buf)
+	parentY := ds.FindBuffered(y, buf)
 	if parentX == parentY {
 		return
 	}
