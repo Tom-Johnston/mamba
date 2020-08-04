@@ -94,6 +94,46 @@ func (s *SortedInts) Add(x ...int) {
 	*s = tmp
 }
 
+//Union adds the elements in a to s.Union
+//This is more efficient than Add as it doesn't create any extra slices.
+func (s *SortedInts) Union(b SortedInts) {
+	a := *s
+	newSize := len(a) + len(b) - IntersectionSize(a, b)
+	var dst []int
+	if cap(a) >= newSize {
+		dst = a[:newSize]
+	} else {
+		dst = make([]int, newSize)
+	}
+	i := len(a) - 1   //Position in a
+	j := len(b) - 1   //Position in b
+	k := len(dst) - 1 //Position in dst
+	for i >= 0 && j >= 0 {
+		if a[i] == b[j] {
+			dst[k] = a[i]
+			i--
+			j--
+			k--
+		} else if a[i] > b[j] {
+			dst[k] = a[i]
+			i--
+			k--
+		} else {
+			dst[k] = b[j]
+			j--
+			k--
+		}
+	}
+
+	if i >= 0 {
+		copy(dst, a[:i+1])
+	} else if j >= 0 {
+		copy(dst, b[:j+1])
+	}
+
+	*s = dst
+}
+
 //IntersectionSize returns the number of elements in both a and b.
 func IntersectionSize(a, b SortedInts) int {
 	intersection := 0
