@@ -158,3 +158,75 @@ func (iter *MultisetPermutationIterator) Value() []int {
 func (iter *MultisetPermutationIterator) Next() bool {
 	return iter.lexIter.Next()
 }
+
+//Topological sorts as in Algorithm V of The Art of Computer Programming Volume 4a Section 7.2.1.2.
+
+//TopologicalSortIterator iterates over all topologial sorts of {0, 1, ..., n-1} respecting some partial order of the total order 0 < 1 < ... < n -1.
+type TopologicalSortIterator struct {
+	less     func(i, j int) bool
+	state    []int
+	invState []int
+	n        int
+	first    bool
+}
+
+//TopologicalSorts returns an iterator which iterates over all topological sorts of {0, 1, ... , n-1} according to the partial order less. If less(i,j) == true, then this only iterates over permutations where i appears before j.
+//less must be a sub-order of the total order 0 < 1 < ... n -1 i.e. for inputs i < j the function less should return true if the condition i < j should be imposed and false otherwise. If i >= j, the function should return false.
+//The function less doesn't need to be transitive as if i < j < k, then less(i,k) will never be called.
+//If less(i,j) == true, then the inverse permutation is such that the value in position i is smaller than the value in position j. The function iter.InverseValue() returns the inverse permutation.
+func TopologicalSorts(n int, less func(i, j int) bool) *TopologicalSortIterator {
+	state := make([]int, n)
+	for i := range state {
+		state[i] = i
+	}
+	invState := make([]int, n)
+	for i := range invState {
+		invState[i] = i
+	}
+
+	return &TopologicalSortIterator{less: less, state: state, invState: invState, n: n, first: true}
+}
+
+//Value returns the current permutation.
+func (iter *TopologicalSortIterator) Value() []int {
+	return iter.state
+}
+
+//InverseValue returns the inverse the to current permutation.
+func (iter *TopologicalSortIterator) InverseValue() []int {
+	return iter.invState
+}
+
+//Next attempts to advance the iterator to the next permutation, returning true if there is one and false otherwise.
+func (iter *TopologicalSortIterator) Next() bool {
+	if iter.first {
+		iter.first = false
+		return true
+	}
+
+	n := iter.n
+	for k := n - 1; k >= 0; k-- {
+		j := iter.invState[k]
+		if j > 0 {
+			l := iter.state[j-1]
+			//TODO: Do we always have l < k here?
+			if !iter.less(l, k) {
+				iter.state[j-1] = k
+				iter.state[j] = l
+				iter.invState[k] = j - 1
+				iter.invState[l] = j
+				return true
+			}
+		}
+
+		for j < k {
+			l := iter.state[j+1]
+			iter.state[j] = l
+			iter.invState[l] = j
+			j++
+		}
+		iter.state[k] = k
+		iter.invState[k] = k
+	}
+	return false
+}
