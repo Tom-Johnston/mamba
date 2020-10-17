@@ -161,7 +161,7 @@ func (iter *MultisetPermutationIterator) Next() bool {
 
 //Topological sorts as in Algorithm V of The Art of Computer Programming Volume 4a Section 7.2.1.2.
 
-//TopologicalSortIterator iterates over all topologial sorts of {0, 1, ..., n-1} respecting some partial order of the total order 0 < 1 < ... < n -1.
+//TopologicalSortIterator iterates over all topological sorts of {0, 1, ..., n-1} respecting some partial order of the total order 0 < 1 < ... < n -1.
 type TopologicalSortIterator struct {
 	less     func(i, j int) bool
 	state    []int
@@ -188,11 +188,13 @@ func TopologicalSorts(n int, less func(i, j int) bool) *TopologicalSortIterator 
 }
 
 //Value returns the current permutation.
+//You must not modify the value.
 func (iter *TopologicalSortIterator) Value() []int {
 	return iter.state
 }
 
 //InverseValue returns the inverse the to current permutation.
+//You must not modify the value.
 func (iter *TopologicalSortIterator) InverseValue() []int {
 	return iter.invState
 }
