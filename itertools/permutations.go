@@ -232,3 +232,93 @@ func (iter *TopologicalSortIterator) Next() bool {
 	}
 	return false
 }
+
+//RestrictedPrefixPermutationIterator iterates over all permutations a_1 a_2 ... a_n of {0, ..., n-1} which pass the tests f([]int{a_1}), f([]int{a_1,a_2}) ... f([]int{a_1,...,a_n}).
+//It iterates over the allowed permutations in lexicographic order.
+type RestrictedPrefixPermutationIterator struct {
+	n int
+	a []int
+	f func([]int) bool
+
+	l []int
+	u []int
+}
+
+//RestrictedPrefixPermutations returns an iterator which iterates over all permutations a_1 a_2 ... a_n of {0, ..., n-1} which pass the tests f([]int{a_1}), f([]int{a_1,a_2}) ... f([]int{a_1,...,a_n}).
+//It iterates over the allowed permutations in lexicographic order.
+func RestrictedPrefixPermutations(n int, f func([]int) bool) *RestrictedPrefixPermutationIterator {
+	//We won't initialise a so we can use it as an indicator that we are in the first call of Next().
+	l := make([]int, n+1)
+	for i := 0; i < n; i++ {
+		l[i] = i + 1
+	}
+	l[n] = 0
+	u := make([]int, n)
+
+	return &RestrictedPrefixPermutationIterator{n: n, a: nil, f: f, l: l, u: u}
+}
+
+//Next attempts to advance the iterator to the next allowed permutation, returning true if there is one and false otherwise.
+func (iter *RestrictedPrefixPermutationIterator) Next() bool {
+	//This is a copy of Algorithm X in 7.2.1.2 in Art of Computer Programming, Volume 4a.
+	//The flow control is quite complicated so removing the goto statements is a lot of work and would end up duplicating a lot of logic. This is only compounded by needing two entry points, one for the first call of Next() and one for every other call.
+	n := iter.n
+	k := n - 1
+	p := 0
+	q := 0
+
+	//Initialise
+	if iter.a == nil {
+		//The first call of Next()
+		iter.a = make([]int, n)
+		k = 0
+		if n == 0 {
+			return true
+		}
+	} else {
+		//Not the first call so the last thing we did was visit a permutation.
+		goto x6
+	}
+
+x2:
+	p = n
+	q = iter.l[n]
+
+x3:
+	iter.a[k] = q
+	if !iter.f(iter.a[:k+1]) {
+		goto x5
+	}
+	if k == n-1 {
+		return true
+	}
+
+	iter.u[k] = p
+	iter.l[p] = iter.l[q]
+	k++
+	goto x2
+
+x5:
+	p = q
+	q = iter.l[p]
+
+	if q != n {
+		goto x3
+	}
+
+x6:
+	k--
+	if k < 0 {
+		return false
+	}
+	p = iter.u[k]
+	q = iter.a[k]
+	iter.l[p] = q
+	goto x5
+}
+
+//Value returns the current permutation.
+//You must not modify the value.
+func (iter *RestrictedPrefixPermutationIterator) Value() []int {
+	return iter.a
+}

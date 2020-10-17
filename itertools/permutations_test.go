@@ -135,3 +135,26 @@ func TestTopologicalSorts(t *testing.T) {
 		counter++
 	}
 }
+
+func TestRestrictedPrefixPermutations(t *testing.T) {
+	f := func(a []int) bool {
+		if ints.Equal(a, []int{1}) || ints.Equal(a, []int{0, 2, 1}) || ints.Equal(a, []int{0, 3}) || ints.Equal(a, []int{2, 0, 3}) || ints.Equal(a, []int{3, 2, 0, 1}) {
+			return false
+		}
+		return true
+	}
+
+	correctResult := [][]int{{0, 1, 2, 3}, {0, 1, 3, 2}, {0, 2, 3, 1}, {2, 0, 1, 3}, {2, 1, 0, 3}, {2, 1, 3, 0}, {2, 3, 0, 1}, {2, 3, 1, 0}, {3, 0, 1, 2}, {3, 0, 2, 1}, {3, 1, 0, 2}, {3, 1, 2, 0}, {3, 2, 1, 0}}
+
+	iter := RestrictedPrefixPermutations(4, f)
+	i := 0
+	for iter.Next() {
+		if !ints.Equal(iter.Value(), correctResult[i]) {
+			t.FailNow()
+		}
+		i++
+	}
+	if i != len(correctResult) {
+		t.Fail()
+	}
+}
