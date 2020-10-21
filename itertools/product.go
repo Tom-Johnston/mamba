@@ -52,3 +52,83 @@ func (p *ProductIterator) Next() bool {
 	}
 	return false
 }
+
+//RestrictedPrefixProductIterator iterates over all elements (a_0, a_1, ..., a_{len(n)-1}) of {0, ..., n[0] - 1} x {0, ..., n[1] - 1} x ... x {0, ..., n[len(n) - 1] - 1} which pass the tests f(a_0), f(a_0, a_1), ...
+//If len(n) == 0, then the value []int{} is considered to pass.
+type RestrictedPrefixProductIterator struct {
+	state []int
+	n     []int
+	t     func([]int) bool
+	empty bool
+}
+
+//RestrictedPrefixProduct returns a *RestrictedPrefixProductIterator which iterates over all elements (a_0, a_1, ..., a_{len(n)-1}) of {0, ..., n[0] - 1} x {0, ..., n[1] - 1} x ... x {0, ..., n[len(n) - 1] - 1} which pass the test f(a_0), f(a_0, a_1), ...
+func RestrictedPrefixProduct(t func([]int) bool, n ...int) *RestrictedPrefixProductIterator {
+	empty := false
+	for _, v := range n {
+		if v < 1 {
+			empty = true
+		}
+	}
+	m := len(n)
+	state := make([]int, 0, m)
+	//Create a deep copy of n in case it changes.
+	tmpN := make([]int, m)
+	copy(tmpN, n)
+	return &RestrictedPrefixProductIterator{state: state, n: tmpN, t: t, empty: empty}
+}
+
+//Value returns the current value of the iterator. You must not modify the value.
+func (p RestrictedPrefixProductIterator) Value() []int {
+	return p.state
+}
+
+//Next attempts to move the iterator to the next state, returning true if there is one and false if there isn't.
+func (p *RestrictedPrefixProductIterator) Next() bool {
+	//This could be rewritten without goto statements if we wanted.
+	m := len(p.n)
+
+	if p.empty {
+		return false
+	}
+
+	if len(p.state) == 0 {
+		if m == 0 {
+			p.empty = true
+			return true
+		}
+		goto x1
+	} else {
+		goto x2
+	}
+
+x1:
+	//Increase the size
+	p.state = append(p.state, 0)
+	goto x3
+
+x2:
+	//Find the next state
+	if p.state[len(p.state)-1] < p.n[len(p.state)-1]-1 {
+		p.state[len(p.state)-1]++
+	} else {
+		if len(p.state) == 1 {
+			return false
+		}
+		p.state = p.state[:len(p.state)-1]
+		goto x2
+	}
+
+x3:
+	//Test the current state
+	if !p.t(p.state) {
+		//Fail - find the next state.
+		goto x2
+	}
+	if len(p.state) < m {
+		//We pass the tests but we need to extend the product
+		goto x1
+	}
+	//We have a state!
+	return true
+}
