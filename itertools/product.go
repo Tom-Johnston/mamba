@@ -10,10 +10,10 @@ type ProductIterator struct {
 
 //Product returns a *ProductIterator to iterate over {0, ..., n[0] - 1} x {0, ..., n[1] - 1} x ... x {0, ..., n[len(n) - 1] - 1}.
 func Product(n ...int) *ProductIterator {
-	empty := true
+	empty := false
 	for _, v := range n {
 		if v < 1 {
-			empty = false
+			empty = true
 		}
 	}
 
@@ -43,8 +43,12 @@ func (p *ProductIterator) Next() bool {
 			for k := j + 1; k < n; k++ {
 				p.state[k] = 0
 			}
-			return p.empty
+			return !p.empty
 		}
+	}
+	if n == 0 && !p.empty {
+		p.empty = true
+		return true
 	}
 	return false
 }
