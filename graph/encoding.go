@@ -72,7 +72,7 @@ func Graph6Encode(g Graph) string {
 	var s []byte
 	n := g.N()
 	if n <= 1 {
-		return string(n + 63)
+		return string(rune(n + 63))
 	} else if n <= 62 {
 		s = make([]byte, 1, 1+((n*(n-1))/2+5)/6)
 		s[0] = byte(n + 63)
