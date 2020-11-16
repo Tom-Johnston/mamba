@@ -37,10 +37,11 @@ func TestChromaticNumber(t *testing.T) {
 	truthData[8] = []int{0, 1, 1118, 87381, 155291, 28722, 2028, 118, 8, 1}
 	truthData[9] = []int{0, 1, 5478, 2104349, 7855628, 1919895, 115391, 4251, 165, 9, 1}
 	for i := 1; i <= 8; i++ {
-		output := make(chan *graph.DenseGraph)
 		foundData := make([]int, i+1)
-		go search.All(i, output, 0, 1)
-		for g := range output {
+
+		iter := search.All(i, 0, 1)
+		for iter.Next() {
+			g := iter.Value()
 			chromaticNumber, colouring := graph.ChromaticNumber(g)
 			if !graph.IsProperColouring(g, colouring) {
 				t.Fatal(g, colouring)
@@ -98,7 +99,6 @@ func TestChromaticIndex(t *testing.T) {
 	truthData[7] = []int{1, 4, 26, 375, 2130, 4895, 3855, 1060}
 	truthData[8] = []int{1, 4, 37, 1061, 14039, 68696, 113774, 64669, 12378, 9}
 	for i := 1; i <= 7; i++ {
-		output := make(chan *graph.DenseGraph)
 		var foundData []int
 		if i%2 == 0 || i == 1 {
 			foundData = make([]int, i)
@@ -106,8 +106,9 @@ func TestChromaticIndex(t *testing.T) {
 			foundData = make([]int, i+1)
 		}
 
-		go search.All(i, output, 0, 1)
-		for g := range output {
+		iter := search.All(i, 0, 1)
+		for iter.Next() {
+			g := iter.Value()
 			chromaticIndex, _ := graph.ChromaticIndex(g)
 			foundData[chromaticIndex]++
 		}

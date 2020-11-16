@@ -14,9 +14,9 @@ func TestPlanarGraph(t *testing.T) {
 	foundData := make([]int, maxSize+1)
 	// seen := make(map[string]graph.DenseGraph)
 	for i := 0; i <= maxSize; i++ {
-		output := make(chan *graph.DenseGraph)
-		go search.All(i, output, 0, 1)
-		for g := range output {
+		iter := search.All(i, 0, 1)
+		for iter.Next() {
+			g := iter.Value()
 			if graph.IsPlanar(g) {
 				foundData[g.N()]++
 			}

@@ -11,7 +11,7 @@ import (
 	"github.com/Tom-Johnston/mamba/graph/search"
 )
 
-func Example() {
+func Example_circleGraphs() {
 
 	//This program generates all circle graphs on 8 vertices using a canonical deletion method and writes the Graph6 encoding of each graph to os.Stdout.
 
@@ -26,15 +26,16 @@ func Example() {
 	b := make([]byte, 0)
 	neighbours := make([]uint, n)
 
-	//The graphs from the search will be output on this channel.
-	output := make(chan *graph.DenseGraph, 1)
+	//Make an iterator.
+	iter := search.WithPruning(n, 0, 1, func(g *graph.DenseGraph) bool { return false }, func(g *graph.DenseGraph) bool { return !isCircleGraph(g, mat, b, neighbours) })
 
-	//Start the search!
-	go search.WithPruning(n, output, 0, 1, func(g *graph.DenseGraph) bool { return false }, func(g *graph.DenseGraph) bool { return !isCircleGraph(g, mat, b, neighbours) })
-
-	//Read the graphs from the output channel and print the Graph6 encoding to os.Stdout
+	//Counter to keep track of how many graphs we find.
 	counter := 0
-	for g := range output {
+	//Keep iterating until there are no more graphs.
+	for iter.Next() {
+		//Get the value of the iterator. Note that we must not edit the value.
+		g := iter.Value()
+		//Encode the graph and write to Stdout.
 		s := graph.Graph6Encode(g)
 		fmt.Println(s)
 		counter++

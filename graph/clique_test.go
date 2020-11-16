@@ -23,10 +23,10 @@ func TestCliqueNumber(t *testing.T) {
 	truthData[9] = []int{0, 1, 1896, 101267, 142276, 27107, 1995, 117, 8, 1}
 	truthData[10] = []int{0, 1, 12171, 2882460, 7269487, 1724440, 112225, 4210, 164, 9, 1}
 	for i := 0; i <= 8; i++ {
-		output := make(chan *graph.DenseGraph)
 		foundData := make([]int, i+1)
-		go search.All(i, output, 0, 1)
-		for g := range output {
+		iter := search.All(i, 0, 1)
+		for iter.Next() {
+			g := iter.Value()
 			foundData[graph.CliqueNumber(g)]++
 		}
 		if !ints.Equal(foundData, truthData[i]) {

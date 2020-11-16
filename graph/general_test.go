@@ -24,10 +24,11 @@ func TestDegeneracy(t *testing.T) {
 	truthData[8] = []int{1, 75, 3378, 6979, 1758, 144, 10, 1}
 	truthData[9] = []int{1, 152, 31782, 166258, 70811, 5421, 231, 11, 1}
 	for i := 1; i <= 8; i++ {
-		output := make(chan *graph.DenseGraph)
 		foundData := make([]int, i)
-		go search.All(i, output, 0, 1)
-		for g := range output {
+
+		iter := search.All(i, 0, 1)
+		for iter.Next() {
+			g := iter.Value()
 			d, order := graph.Degeneracy(g)
 			for i, v := range order {
 				orderD := 0
@@ -56,9 +57,9 @@ func TestBiconnectedComponents(t *testing.T) {
 	truthData := []int{0, 0, 1, 1, 3, 10, 56, 468, 7123, 194066, 9743542, 900969091}
 	foundData := make([]int, maxSize+1)
 	for i := 0; i <= maxSize; i++ {
-		output := make(chan *graph.DenseGraph)
-		go search.All(i, output, 0, 1)
-		for g := range output {
+		iter := search.All(i, 0, 1)
+		for iter.Next() {
+			g := iter.Value()
 			c, _ := graph.BiconnectedComponents(g)
 			if len(c) == 1 && len(c[0]) > 1 {
 				foundData[g.N()]++

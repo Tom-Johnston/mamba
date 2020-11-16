@@ -21,11 +21,11 @@ func TestGirth(t *testing.T) {
 	truthData[7] = []int{0, 0, 0, 937, 59, 8, 2, 1}
 	truthData[8] = []int{0, 0, 0, 11936, 296, 26, 9, 2, 1}
 	for i := 0; i <= 8; i++ {
-		output := make(chan *graph.DenseGraph)
 		foundData := make([]int, i+1)
 
-		go search.All(i, output, 0, 1)
-		for g := range output {
+		iter := search.All(i, 0, 1)
+		for iter.Next() {
+			g := iter.Value()
 			girth := graph.Girth(g)
 			if girth > 0 {
 				foundData[girth]++
@@ -66,11 +66,11 @@ func TestDiameter(t *testing.T) {
 	truthData[7] = []int{0, 1, 373, 387, 82, 9, 1}
 	truthData[8] = []int{0, 1, 4154, 5797, 1027, 125, 12, 1}
 	for i := 1; i <= 7; i++ {
-		output := make(chan *graph.DenseGraph)
 		foundData := make([]int, i)
 
-		go search.All(i, output, 0, 1)
-		for g := range output {
+		iter := search.All(i, 0, 1)
+		for iter.Next() {
+			g := iter.Value()
 			diam := graph.Diameter(g)
 			if diam > -1 {
 				foundData[diam]++
@@ -121,11 +121,11 @@ func TestRadius(t *testing.T) {
 	truthData[7] = []int{0, 156, 682, 15}
 	truthData[8] = []int{0, 1044, 9864, 207, 2}
 	for i := 0; i <= 8; i++ {
-		output := make(chan *graph.DenseGraph)
 		foundData := make([]int, (i/2)+1)
 
-		go search.All(i, output, 0, 1)
-		for g := range output {
+		iter := search.All(i, 0, 1)
+		for iter.Next() {
+			g := iter.Value()
 			diam := graph.Radius(g)
 			if diam > -1 {
 				foundData[diam]++

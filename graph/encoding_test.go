@@ -38,9 +38,9 @@ func TestGraph6(t *testing.T) {
 	}
 
 	for i := 1; i <= 8; i++ {
-		output := make(chan *graph.DenseGraph)
-		go search.All(i, output, 0, 1)
-		for g := range output {
+		iter := search.All(i, 0, 1)
+		for iter.Next() {
+			g := iter.Value()
 			s := graph.Graph6Encode(g)
 			h, err := graph.Graph6Decode(s)
 			if err != nil {
