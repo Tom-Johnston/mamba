@@ -1,6 +1,8 @@
 package search
 
 import (
+	"encoding/gob"
+	"io"
 	"math/bits"
 
 	"github.com/Tom-Johnston/mamba/comb"
@@ -11,6 +13,8 @@ import (
 )
 
 //GraphIterator is an iterator which iterates over all non-isomorphic graphs. It should be initialised with either All or WithPruning.
+//The current state of the iterator can be saved with Save() and then this can be loaded again using Resume().
+//A GraphIterator is not safe for concurrent use by multiple goroutines.
 type GraphIterator struct {
 	n        int
 	a        int
@@ -31,10 +35,11 @@ type GraphIterator struct {
 	ds disjoint.Set
 
 	//Options for the DFS
-	stepForward bool
 	choices     []uint
 	currentPath []int
-	v           []int
+
+	//Storage for the DFS
+	v []int
 }
 
 //All with a = 0 and m = 1 returns a *GraphIterator which iterates over all graphs on n vertices. In general, the iterator uses a canonical deletion DFS to find all graphs on at most n vertices where the choice at level ceil(2n/3) - 1 is equal to a mod m. For small values of m this should produce a fairly even split and allow for some small parallelism.
@@ -83,7 +88,6 @@ func WithPruning(n int, a int, m int, preprune, prune func(g *graph.DenseGraph) 
 	iter.ds = ds
 
 	//Initialise the options for the DFS
-	iter.stepForward = false
 	// iter.choices = make([]uint, 0)
 	iter.currentPath = make([]int, 0, n)
 	iter.v = make([]int, 0, n)
@@ -126,6 +130,8 @@ func (iter *GraphIterator) Next() bool {
 		cont = false
 	}
 
+	stepForward := false
+
 	for true {
 		if !cont {
 			if iter.sg.G.NumberOfVertices == iter.n {
@@ -134,7 +140,7 @@ func (iter *GraphIterator) Next() bool {
 				//Prepare to go deeper.
 				numAugs := addAugmentations(iter.sg, &iter.choices, iter.ds, iter.op, iter.storage, iter.options)
 				iter.currentPath = append(iter.currentPath, numAugs)
-				iter.stepForward = true
+				stepForward = true
 			}
 		} else {
 			cont = false
@@ -166,12 +172,12 @@ func (iter *GraphIterator) Next() bool {
 				}
 
 				//Are we moving deeper or to the next child?
-				if !iter.stepForward {
+				if !stepForward {
 					iter.sg.G.RemoveVertex(iter.sg.G.NumberOfVertices - 1)
 					clearAutomorphismGroup(iter.sg)
 				}
 
-				iter.stepForward = false
+				stepForward = false
 
 				//Take the step
 				iter.sg.G.AddVertex(iter.v)
@@ -190,11 +196,11 @@ func (iter *GraphIterator) Next() bool {
 				}
 			}
 			//None of the options on this level worked so take a step back
-			if !iter.stepForward {
+			if !stepForward {
 				iter.sg.G.RemoveVertex(iter.sg.G.NumberOfVertices - 1)
 				clearAutomorphismGroup(iter.sg)
 			}
-			iter.stepForward = false
+			stepForward = false
 			iter.currentPath = iter.currentPath[:len(iter.currentPath)-1]
 		}
 	}
@@ -204,6 +210,68 @@ func (iter *GraphIterator) Next() bool {
 //Value returns the current value of the iterator. You must not modify the returned value.
 func (iter *GraphIterator) Value() *graph.DenseGraph {
 	return iter.sg.G
+}
+
+//save stores the state of a GraphIterator needed to load the iterator later.
+type save struct {
+	N     int
+	A     int
+	M     int
+	First bool
+
+	G *graph.DenseGraph
+
+	Choices     []uint
+	CurrentPath []int
+}
+
+//Save writes the current state of the iterator to w so that it can be loaded using Load. This doesn't save the functions preprune and prune which will need to be supplied to Load on loading.
+//This cannot be called concurrently with Next and can only be called between graphs.
+func (iter *GraphIterator) Save(w io.Writer) {
+	//Create and fill a save struct.
+	s := new(save)
+	s.N = iter.n
+	s.A = iter.a
+	s.M = iter.m
+	s.First = iter.first
+	s.G = iter.sg.G
+	s.Choices = iter.choices
+	s.CurrentPath = iter.currentPath
+
+	//Encode the save struct using gob.
+	enc := gob.NewEncoder(w)
+	err := enc.Encode(s)
+	if err != nil {
+		panic(err)
+	}
+}
+
+//Load creates a new *GraphIterator from the saved information in r.
+func Load(r io.Reader, preprune, prune func(g *graph.DenseGraph) bool) *GraphIterator {
+	//Decode the saved state into s.
+	s := new(save)
+	dec := gob.NewDecoder(r)
+	err := dec.Decode(s)
+	if err != nil {
+		panic(err)
+	}
+
+	//Create a new iterator in the starting state.
+	iter := WithPruning(s.N, s.A, s.M, preprune, prune)
+	//Overwrite the relevant parts of the starting state.
+	iter.first = s.First
+
+	iter.choices = s.Choices
+	iter.currentPath = s.CurrentPath
+
+	//Note that the graph s.G might not be correctly sized so we will copy into the allocation.
+	iter.sg.G.NumberOfVertices = s.G.NumberOfVertices
+	iter.sg.G.NumberOfEdges = s.G.NumberOfEdges
+	iter.sg.G.DegreeSequence = iter.sg.G.DegreeSequence[:s.G.NumberOfVertices]
+	copy(iter.sg.G.DegreeSequence, s.G.DegreeSequence)
+	iter.sg.G.Edges = iter.sg.G.Edges[:len(s.G.Edges)]
+	copy(iter.sg.G.Edges, s.G.Edges)
+	return iter
 }
 
 //searchGraph holds a graph and the information from the canonical isomorph.
