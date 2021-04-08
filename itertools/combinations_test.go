@@ -79,3 +79,67 @@ func TestCombinationsColex(t *testing.T) {
 		}
 	}
 }
+
+func TestMultisetCombinations(t *testing.T) {
+	correctOutput := [][]int{
+		{0, 0, 0, 0, 1},
+		{0, 0, 0, 1, 1},
+		{0, 0, 1, 1, 1},
+		{0, 0, 0, 0, 2},
+		{0, 0, 0, 1, 2},
+		{0, 0, 1, 1, 2},
+		{0, 1, 1, 1, 2},
+		{0, 0, 0, 2, 2},
+		{0, 0, 1, 2, 2},
+		{0, 1, 1, 2, 2},
+		{1, 1, 1, 2, 2},
+		{0, 0, 2, 2, 2},
+		{0, 1, 2, 2, 2},
+		{1, 1, 2, 2, 2},
+		{0, 0, 0, 0, 3},
+		{0, 0, 0, 1, 3},
+		{0, 0, 1, 1, 3},
+		{0, 1, 1, 1, 3},
+		{0, 0, 0, 2, 3},
+		{0, 0, 1, 2, 3},
+		{0, 1, 1, 2, 3},
+		{1, 1, 1, 2, 3},
+		{0, 0, 2, 2, 3},
+		{0, 1, 2, 2, 3},
+		{1, 1, 2, 2, 3},
+		{0, 2, 2, 2, 3},
+		{1, 2, 2, 2, 3},
+		{0, 0, 0, 3, 3},
+		{0, 0, 1, 3, 3},
+		{0, 1, 1, 3, 3},
+		{1, 1, 1, 3, 3},
+		{0, 0, 2, 3, 3},
+		{0, 1, 2, 3, 3},
+		{1, 1, 2, 3, 3},
+		{0, 2, 2, 3, 3},
+		{1, 2, 2, 3, 3},
+		{2, 2, 2, 3, 3},
+	}
+	iter := MultisetCombinations([]int{4, 3, 3, 2}, 5)
+	index := 0
+	for iter.Next() {
+		if index >= len(correctOutput) {
+			t.Log("Found too many multisets.")
+			t.FailNow()
+		}
+		found := iter.Value()
+		truth := correctOutput[index]
+		if len(found) != len(truth) {
+			t.FailNow()
+		}
+		for i := range found {
+			if found[i] != truth[i] {
+				t.FailNow()
+			}
+		}
+		index++
+	}
+	if index != len(correctOutput) {
+		t.Error("Found too few multisets.")
+	}
+}
