@@ -188,10 +188,10 @@ func (m *Matrix) SetEntry(i, j int, b byte) {
 	r := m.RowPerm[i]
 	switch b {
 	case 0:
-		m.Entries[r*((m.N+63)/64)+j/64] &^= (1 << (j % 64))
+		m.Entries[r*((m.N+63)/64)+j/64] &^= (1 << uint(j%64))
 		return
 	case 1:
-		m.Entries[r*((m.N+63)/64)+j/64] |= (1 << (j % 64))
+		m.Entries[r*((m.N+63)/64)+j/64] |= (1 << uint(j%64))
 		return
 	}
 	panic("b is not 0 or 1")
@@ -200,7 +200,7 @@ func (m *Matrix) SetEntry(i, j int, b byte) {
 //GetEntry returns the (i,j) entry of m.
 func (m *Matrix) GetEntry(i, j int) uint64 {
 	r := m.RowPerm[i]
-	return (m.Entries[r*((m.N+63)/64)+j/64] >> (j % 64)) & 1
+	return (m.Entries[r*((m.N+63)/64)+j/64] >> uint(j%64)) & 1
 }
 
 //AddRowTo replaces the dst row with dst row + src row.
