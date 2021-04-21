@@ -1,6 +1,7 @@
 package itertools
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/Tom-Johnston/mamba/ints"
@@ -156,5 +157,70 @@ func TestRestrictedPrefixPermutations(t *testing.T) {
 	}
 	if i != len(correctResult) {
 		t.Fail()
+	}
+}
+
+func TestPermutationsByPattern(t *testing.T) {
+	//flatten replaces src by the unique permutation which is order-isomorphic to src.
+	//If src[i] is the jth smallest entry amongst all the elements in src, then src[i] is set to j.
+	//buf is storage space that may be used in the computation. buf must have capacity at least len(src).
+	flatten := func(src, buf []int) {
+		//This is a very basic implementation and could undoubtedly be quicker.
+		n := len(src)
+		buf = buf[:n]
+		copy(buf, src)
+		ints.Sort(buf)
+
+		for i, v := range src {
+			u := sort.SearchInts(buf, v)
+			src[i] = u
+		}
+	}
+
+	//endsWithSquare checks if the permutation contains a square which ends at the last entry of a.
+	//buf is storage space which may be used in the computation. buf must have capacity at least 3*len(a).
+	endsWithSquare := func(a []int, buf []int) bool {
+		n := len(a)
+
+		//Check for squares of length 2.
+		if n >= 4 {
+			if a[n-2] < a[n-1] && a[n-4] < a[n-3] {
+				return true
+			}
+			if a[n-2] > a[n-1] && a[n-4] > a[n-3] {
+				return true
+			}
+		}
+
+		//Now check for squares of larger lengths.
+		//Since we know the permutation has no squares of length 2, the length of any square must be a multiple of 4.
+		for i := 4; i <= n/2; i += 4 {
+			patt1 := buf[:i]
+			patt2 := buf[n : n+i]
+			copy(patt1, a[n-i:n])
+			copy(patt2, a[n-2*i:n-i])
+			flatten(patt1, buf[2*n:])
+			flatten(patt2, buf[2*n:])
+			if ints.Equal(patt1, patt2) {
+				return true
+			}
+		}
+		return false
+	}
+
+	truthData := []int{1, 1, 2, 6, 12, 34, 104, 406, 1112, 3980, 15216, 68034, 312048, 1625968, 8771376, 53270068, 319218912, 2135312542, 14420106264}
+	for i := 0; i < 10; i++ {
+		v := truthData[i]
+		buf := make([]int, 3*i)
+		f := func(a []int) bool { return !endsWithSquare(a, buf) }
+		iter := PermutationsByPattern(i, f)
+		count := 0
+		for iter.Next() {
+			count++
+		}
+		if count != v {
+			t.Log(count)
+			t.Fail()
+		}
 	}
 }

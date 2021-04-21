@@ -322,3 +322,78 @@ x6:
 func (iter *RestrictedPrefixPermutationIterator) Value() []int {
 	return iter.a
 }
+
+//PermutationsByPatternIterator holds the state for an iterator which iterates over all permutations which pass a test function at every step.
+type PermutationsByPatternIterator struct {
+	n     int
+	a     []int
+	f     func([]int) bool
+	first bool
+}
+
+//PermutationsByPattern iterates over all permutations of {0, 1, ..., n -1} which pass the test function f at every step. The iterator starts with the empty permutation. It then does a DFS where the children of a permutation P of length l < n are the permutations of length l + 1 formed by appending a number x in {0, ..., l} and increasing by 1 every entry of P which is at least x. The function f is called at each node of the DFS and the iterator will prune the children of a node v if f(v) is false.
+func PermutationsByPattern(n int, f func([]int) bool) *PermutationsByPatternIterator {
+	return &PermutationsByPatternIterator{n: n, a: nil, f: f}
+}
+
+//Value returns the current permutation.
+//You must not modify the returned value.
+func (iter *PermutationsByPatternIterator) Value() []int {
+	return iter.a
+}
+
+//Next attempts to move to the next valid permutation, returning true if one exists and false otherwise.
+func (iter *PermutationsByPatternIterator) Next() bool {
+	//Initialise
+	if iter.a == nil || iter.first {
+		//The first call of Next()
+		iter.first = false
+		iter.a = make([]int, 0, iter.n)
+		if iter.n == 0 {
+			return true
+		}
+	} else {
+		//Not the first call so the last thing we did was visit a permutation.
+		goto x3
+	}
+
+	//Extend
+x1:
+	iter.a = append(iter.a, len(iter.a))
+	//Test
+x2:
+	if iter.f(iter.a) {
+		//Success
+		if len(iter.a) == iter.n {
+			return true
+		}
+		goto x1
+	}
+
+	//Test has failed so we need to increase the state.
+x3:
+	if len(iter.a) == 0 {
+		return false
+	}
+
+	x := iter.a[len(iter.a)-1]
+	if x == 0 {
+		iter.a = iter.a[:len(iter.a)-1]
+		for i := range iter.a {
+			if iter.a[i] > x {
+				iter.a[i]--
+			}
+		}
+		goto x3
+	}
+
+	for i := range iter.a {
+		if iter.a[i] == x-1 {
+			iter.a[i]++
+			break
+		}
+	}
+	iter.a[len(iter.a)-1]--
+	goto x2
+
+}
